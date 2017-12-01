@@ -1,0 +1,89 @@
+---
+title: "Diversity and Math Survey Analysis"
+author: "Adriana Souza, Lydia Laseur, Roger Filmyer"
+date: "November 12th, 2017"
+output:
+  html_notebook:
+    highlight: tango
+    mathjax: null
+    number_sections: yes
+    theme: spacelab
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+# Loading packages we will be using
+library(lodown)
+library(srvyr)
+library(psych)
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Please run these lines in your console before beginning:
+install.packages( "devtools" , repos = "http://cran.rstudio.com/" )
+library(devtools)
+install_github( "ajdamico/lodown" , dependencies = TRUE )
+
+# The R srvyr package by Greg Freedman Ellis allows dplyr-like syntax for many survey package commands.
+install.packages( "srvyr" , repos = "http://cran.rstudio.com/" )
+```
+
+
+## Overview and motivation
+
+This is a report created for Professor Chris Kottke's survey. Goals of the survey were to get more information about the students in order to address the lack of gender diversity in the math AOC. Dr. Kottke wanted to get a sense of how the students feel and test the incidence of things like belonging uncertainty, impostor syndrome, and stereotype threat at New College of Florida.
+
+This report has three goals: 
+
+(1) To generate visualizations as per requested by Dr. Kottke, 
+(2) To conduct analysis focused on how the self-reported gender and ethinicty condition the responses, and 
+(3) To be fully reproducible. 
+
+One of the reasons was 
+
+## Survey information
+
+The population consists of New College students exclusively, given that only respondents with an *@ncf.edu* email address were allowed to reply. New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses.
+
+The data was de-identified for the purpose of this study so no IRB approval was required. The survey data was designed with the help of...
+
+
+## Data
+
+### Issues
+
+## Analysis
+
+Suggestions from Melissa:
+
++ Non-parametric rank-based inference such as the median, the Mann-Whitney U test, or the Kruskal Wallis test. 
++ But if we have a well-defined likert scale, we might still be able to get useful results with standard statistical summaries and inference as well (though Melissa is not sure whether the assumptions for standard linear regression would be met).
++  It could be interesting for your project to try (for example) to see what you find when you compare the means of two groups vs the medians of two groups. Or what do you find if you do a t-test vs a MW test? etc. 
+
+
+### Setting up data
+
+```{r data}
+## Reading data in
+data <- read.csv(survey_responses.csv)
+```
+
+## Question breakdown
+
+## Results
+
+
+
+%--------------------------------------------------------------------
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
