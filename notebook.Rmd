@@ -23,6 +23,7 @@ library(ggplot2)
 library(tibble)
 library(reshape2)
 library(tidyr)
+library(stringi)
 ```
 
 
@@ -65,15 +66,25 @@ First, Likert scales are arbitrary; the value assigned to an item has no objecti
 
 The second major problem is whether the "distance" between each Likert item is equivalent. A good Likert scale will present a symmetry of categories about a midpoint with clearly defined linguistic qualifiers.
 
-- Non-response bias
+- **Non-response bias**
 
 The phenomenon that the required information is not obtained from the people selected in the sample.
 
-- Social Desirability and acquiescence bias
+- **Social Desirability and acquiescence bias**
 
 Respondents may avoid using extreme response categories out of a desire of being perceived as having extremist views
 
-Agree with statements as presented
+Agree with statements as presented ...
+
+
+- **Sample size and power** 
+The probability of not getting false positives is affected by three factors:
+
++ **Sample size (n)** The greater the sample size, the greater the power.  In our case, Other things being equal, the number of responses (264) represents 31% of currently enrolled students at New College. 
+
++ **Significance level ($\alpha$)** The higher the significance level, the higher the power of the test. Increasing the significance level reduces the region of acceptance. As a result, we are more likely to reject the null hypothesis; i.e., we are less likely to accept the null hypothesis when it is false, or making a Type II error. This increases the statistical power of the test.
+
++ **The "true" value of the parameter being tested** The greater the difference between the "true" value of a parameter and the value specified in the null hypothesis, the greater the power of the test. That is, the greater the effect size, the greater the power of the test.
 
 ### Corrections
 
@@ -87,8 +98,6 @@ Agree with statements as presented
 
 # Analysis
 
-Suggestions from Melissa:
-
 + Non-parametric rank-based inference such as the median, the Mann-Whitney U test, or the Kruskal Wallis test. 
 
 + But if we have a well-defined likert scale, we might still be able to get useful results with standard statistical summaries and inference as well (though Melissa is not sure whether the assumptions for standard linear regression would be met).
@@ -96,37 +105,31 @@ Suggestions from Melissa:
 +  It could be interesting for your project to try (for example) to see what you find when you compare the means of two groups vs the medians of two groups. Or what do you find if you do a t-test vs a MW test? etc.
 
 
-### Issues
+## Cleaning up data
 
-Standard inference is based on large-sample asymptotics 
-
-#### Exact Inference
-
-
-
-
-### Setting up data
-
-```{r data}
+```{r read_data}
 ## Reading data in
 raw_data <- read.csv("survey_responses.csv",nrows = 264)
 ```
 
-```{r}
 
-# Reassigning column names, and creating dictionary for new column names
+
+```{r create_dictionary}
+## Reassigning column names, and creating dictionary for new column names
 num_questions <- ncol(raw_data)
 questions <- data.frame(colnames(raw_data))
 new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
 colnames(raw_data) <- new_col_names
 data_dictionary <- data.frame(cbind(questions,new_col_names))
-data <- raw_data #save raw data with new column names to "data" which will be normalized
+
+## Save raw data with new column names to "data" which will be normalized
+data <- raw_data 
 ```
 
 
-```{r}
 
-# normalize gender column into binary data based on whether the responder reported their gender as "Male"
+```{r normalizing_gender}
+## Normalize gender column into binary data based on whether the responder reported their gender as "Male"
 gender_col <- as.character(data$Q1)
 non_male <- gender_col != "Male"
 gender_col[non_male] <-  "Not Male"
@@ -134,30 +137,33 @@ gender_col <- as.factor(gender_col)
 data$Q1 <- gender_col
 ```
 
-```{r}
-data <- raw_data
+
+
+```{r normalizing_ethnicity}
 ethnicity <- data.frame(data$Q2)
 colnames(ethnicity) <- c("ethnicity_list")
+
 ethnicity[ethnicity$ethnicity_list %in% c("Arab", "Middle Eastern"), ] <- "White"
 ethnicity[ethnicity$ethnicity_list == "Black or African American, Hispanic or Latino, Multi-Racial", ] <- "Black or African American, Hispanic or Latino"
 ethnicity[ethnicity$ethnicity_list == "Mixed, Jamaican/Itailian/Chinese", ] <- "Asian, Black or African American, White"
 ethnicity[ethnicity$ethnicity_list %in% c("Alien", "I do not wish to declare my race/ethnicity", ""), ] <- NA
 ethnicity$ethnicity_list <- droplevels(ethnicity$ethnicity_list)
 
+## Get the right ethnic groups
 ethnicity_groups <- levels(ethnicity$ethnicity_list) %>% strsplit(", ") %>% unlist %>% unique
 ethnicity_groups <- ethnicity_groups[!grepl(",", ethnicity_groups)]
 
-
+## Recast the ethnicity table with the comma-separated list into a new table
 ethnicity <- ethnicity %>%
   rowid_to_column("id") %>%
   mutate(ethnic_group = strsplit(as.character(ethnicity_list), ", ")) %>%
   unnest() %>%
   dcast(id ~ ethnic_group)
 
-# we get "White" and NA in the white column
+## We get "White" and NA in the white column, for example
 ethnicity[, -1] <- !is.na(ethnicity)[,-1]
 
-# 2 new columns, non-hispanic white and only white or asian
+## 2 new columns, non-hispanic white and only white or asian
 ethnicity$"Non-Hispanic White" <- !(rowSums(ethnicity[, c("Asian", "Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "NA")]) > 0)
 ethnicity$"Only White or Asian" <- !(rowSums(ethnicity[, c("Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "NA")]) > 0)
 
@@ -165,17 +171,58 @@ data <- cbind(data, ethnicity[, -1])
 ```
 
 
-## Results
 
-
-
-
-%--------------------------------------------------------------------
-```{r}
-plot(cars)
+```{r normalizing_aoc}
+stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "natsci", "nat sci", "natural sci", "math", "chem",
+                          # The fun ones:
+                          "Marine Science", "Conputer Science")
+data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
 
+to_three_averages <- function(fctr){
+  levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
+  return(fctr)
+}
+
+to_three_agrees <- function(fctr){
+  levels(fctr) <- c("Agree", "Disagree", "Neutral", "Agree", "Disagree")
+  return(fctr)
+}
+
+```{r to_three_groups}
+
+```
+
+## Contingency tables and test of association
+
+## Goodness of Fit 
+
+Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
+
+## Logistic Regression
+
+## Comparisons to national statistics
+
+For the comparison of two groups on an ordinal response, 
+
+# Results
+
+
+```{r crosstab_socialgroup_example, eval=FALSE}
+gender_vs_social_group_perception <- table(data$Q1, data$Q17)
+gender_vs_social_group_perception
+```
+
+```{r crosstab_socialgroup_3groups}
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception
+chisq.test(gender_vs_social_group_perception)
+```
+
+## Appendix: Question breakdown
+
+<<<<<<< HEAD
 ## Question breakdown
 ### Question 1: What gender do you identify as?
 ```{r}
@@ -228,8 +275,4 @@ q7 + geom_bar()
 ```
 
 ### Question 8: "I find mathematics interesting."
-
-```{r}
-
-```
 
