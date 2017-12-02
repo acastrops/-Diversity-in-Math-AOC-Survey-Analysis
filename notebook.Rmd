@@ -113,6 +113,7 @@ raw_data <- read.csv("survey_responses.csv",nrows = 264)
 ```
 
 ```{r}
+
 # Reassigning column names, and creating dictionary for new column names
 num_questions <- ncol(raw_data)
 questions <- data.frame(colnames(raw_data))
@@ -124,8 +125,8 @@ data <- raw_data #save raw data with new column names to "data" which will be no
 
 
 ```{r}
-# normalize gender column into binary data based on whether the responder reported their gender as "Male"
 
+# normalize gender column into binary data based on whether the responder reported their gender as "Male"
 gender_col <- as.character(data$Q1)
 non_male <- gender_col != "Male"
 gender_col[non_male] <-  "Not Male"
@@ -168,6 +169,7 @@ data <- cbind(data, ethnicity[, -1])
 
 
 
+
 %--------------------------------------------------------------------
 ```{r}
 plot(cars)
@@ -179,3 +181,4 @@ plot(cars)
 ```{r}
 
 ```
+
