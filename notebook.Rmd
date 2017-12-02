@@ -167,6 +167,15 @@ data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse=
 
 ```{r to_three_groups}
 
+to_three_averages <- function(fctr){
+  levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
+  return(fctr)
+}
+
+to_three_agrees <- function(fctr){
+  levels(fctr) <- c("Agree", "Disagree", "Neutral", "Agree", "Disagree")
+  return(fctr)
+}
 
 ```
 
