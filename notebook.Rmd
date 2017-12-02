@@ -1,5 +1,5 @@
 ---
-title: "Diversity and Math Survey Analysis"
+title: "Does the gender and ethnicity of New College students influence their experience with math classes?"
 author: "Adriana Souza, Lydia Laseur, Roger Filmyer"
 date: "November 12th, 2017"
 output:
@@ -14,6 +14,7 @@ output:
 
 ```{r setup, include=FALSE}
 # Loading packages we will be using
+library(survey)
 library(srvyr)
 library(psych)
 library(shiny)
@@ -25,36 +26,83 @@ library(tidyr)
 ```
 
 
-## Overview and motivation
+# Overview and motivation
 
 This is a report created for Professor Chris Kottke's survey. Goals of the survey were to get more information about the students in order to address the lack of gender diversity in the math AOC. Dr. Kottke wanted to get a sense of how the students feel and test the incidence of things like belonging uncertainty, impostor syndrome, and stereotype threat at New College of Florida.
 
-This report has three goals: 
+The questions had the following goals: 
 
-(1) To generate visualizations as per requested by Dr. Kottke, 
-(2) To conduct analysis focused on how the self-reported gender and ethinicty condition the responses, and 
-(3) To be fully reproducible. 
+(1) Gauging interest in mathematics
+(2) Measuring belonging uncertainty
+(3) Measuring confidence levels
+(4) Stereotype threat
 
-One of the reasons was 
+Conditioned on the self-reported gender and ethinicity.
 
 ## Survey information
 
-The population consists of New College students exclusively, given that only respondents with an *@ncf.edu* email address were allowed to reply. New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses.
+The population consists of New College students exclusively, given that only respondents with an *@ncf.edu* email address were allowed to reply. 
 
-The data was de-identified for the purpose of this study so no IRB approval was required. The survey data was designed with the help of...
++ New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.
 
++ Responders: 60% female, 28.3% male, 11.7% non-binary.
+
++ The data was de-identified for the purpose of this study so no IRB approval was required. 
 
 ## Data
 
+Likert-type responses were chosen due to being a popular psychometric item scoring scheme when trying to quantify people’s opinions on different issues. 
+
+The problem with Likert-type scales and ordinal responses is how to choose the appropriate statistical treatment of the data. If the data is ordinal, then non-parametric statistics are typically considered the most appropriate option for analysis. If the data is interval, then parametric statistics can be used. 
+
+To avoid possible misinterpretation, we took care in analyzing how each variable and question were coded. Additionally, each question has corresponding visualizations that illustrate the relationships more clearly. 
+
 ### Issues
 
-## Analysis
+Likert scales may be subject to distortion from several causes. 
+
+First, Likert scales are arbitrary; the value assigned to an item has no objective numerical basis, either in terms of measure theory or scale (from which a distance metric can be determined). The value assigned to each Likert item is determined by who designed the survey.
+
+The second major problem is whether the "distance" between each Likert item is equivalent. A good Likert scale will present a symmetry of categories about a midpoint with clearly defined linguistic qualifiers.
+
+- Non-response bias
+
+The phenomenon that the required information is not obtained from the people selected in the sample.
+
+- Social Desirability and acquiescence bias
+
+Respondents may avoid using extreme response categories out of a desire of being perceived as having extremist views
+
+Agree with statements as presented
+
+### Corrections
+
+- Using weighted averages:
+
+- Design questions with students' sensitivity in mind; e.g. asking directly what their assessment of their own levels of confidence may not yield usable data due to issues mentioned above
+
+- Having a scale design with balanced keying (an equal number of positive and negative statements regarding each position or issue in question) can mitigate the random error caused by acquiescence bias. Defensive, central tendency, and social desirability biases are somewhat more problematic and were not explicitly addressed in this analysis.
+
+- Lastly, using sliders instead of the typical five-level format would yielf a continuous response variable which would expand the number of tests that could be used for analysis.
+
+# Analysis
 
 Suggestions from Melissa:
 
 + Non-parametric rank-based inference such as the median, the Mann-Whitney U test, or the Kruskal Wallis test. 
+
 + But if we have a well-defined likert scale, we might still be able to get useful results with standard statistical summaries and inference as well (though Melissa is not sure whether the assumptions for standard linear regression would be met).
-+  It could be interesting for your project to try (for example) to see what you find when you compare the means of two groups vs the medians of two groups. Or what do you find if you do a t-test vs a MW test? etc. 
+
++  It could be interesting for your project to try (for example) to see what you find when you compare the means of two groups vs the medians of two groups. Or what do you find if you do a t-test vs a MW test? etc.
+
+
+### Issues
+
+Standard inference is based on large-sample asymptotics 
+
+#### Exact Inference
+
+
 
 
 ### Setting up data
@@ -92,6 +140,27 @@ ethnicity$"Only White or Asian" <- !(rowSums(ethnicity[, c("Black or African Ame
 
 View(ethnicity)
 ```
+
+```{r}
+# Reassigning column names, and creating dictionary for new column names
+data = data[1:264,] #last 100 rows are blank
+num_questions <- ncol(data)
+questions <- data.frame(colnames(data))
+new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
+colnames(data) <- new_col_names
+data_dictionary <- data.frame(cbind(questions,new_col_names))
+```
+
+
+```{r}
+# normalize gender column into binary data based on whether the responder reported their gender as "Male"
+gender_col <- as.character(data$Q1)
+non_male <- gender_col != "Male"
+gender_col[non_male] <-  "Not Male"
+gender_col <- as.factor(gender_col)
+data$Q1 <- gender_col
+```
+
 
 ## Question breakdown
 
