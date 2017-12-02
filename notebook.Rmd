@@ -14,21 +14,14 @@ output:
 
 ```{r setup, include=FALSE}
 # Loading packages we will be using
-library(lodown)
 library(srvyr)
 library(psych)
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(tibble)
+library(reshape2)
 library(tidyr)
-
-# Please run these lines in your console before beginning:
-install.packages( "devtools" , repos = "http://cran.rstudio.com/" )
-library(devtools)
-install_github( "ajdamico/lodown" , dependencies = TRUE )
-
-# The R srvyr package by Greg Freedman Ellis allows dplyr-like syntax for many survey package commands.
-install.packages( "srvyr" , repos = "http://cran.rstudio.com/" )
 ```
 
 
@@ -68,7 +61,36 @@ Suggestions from Melissa:
 
 ```{r data}
 ## Reading data in
-data <- read.csv(survey_responses.csv)
+data <- read.csv("survey_responses.csv")
+```
+
+```{r}
+ethnicity <- data.frame(data$What.is.your.race.ethnicity...Check.all.that.apply.)
+colnames(ethnicity) <- c("ethnicity_list")
+ethnicity[ethnicity$ethnicity_list %in% c("Arab", "Middle Eastern"), ] <- "White"
+ethnicity[ethnicity$ethnicity_list == "Black or African American, Hispanic or Latino, Multi-Racial", ] <- "Black or African American, Hispanic or Latino"
+ethnicity[ethnicity$ethnicity_list == "Mixed, Jamaican/Itailian/Chinese", ] <- "Asian, Black or African American, White"
+ethnicity[ethnicity$ethnicity_list %in% c("Alien", "I do not wish to declare my race/ethnicity", ""), ] <- NA
+ethnicity$ethnicity_list <- droplevels(ethnicity$ethnicity_list)
+
+ethnicity_groups <- levels(ethnicity$ethnicity_list) %>% strsplit(", ") %>% unlist %>% unique
+ethnicity_groups <- ethnicity_groups[!grepl(",", ethnicity_groups)]
+
+
+ethnicity <- ethnicity %>%
+  rowid_to_column("id") %>%
+  mutate(ethnic_group = strsplit(as.character(ethnicity_list), ", ")) %>%
+  unnest() %>%
+  dcast(id ~ ethnic_group)
+
+# we get "White" and NA in the white column
+ethnicity[, -1] <- !is.na(ethnicity)[,-1]
+
+# 2 new columns, non-hispanic white and only white or asian
+ethnicity$"Non-Hispanic White" <- !(rowSums(ethnicity[, c("Asian", "Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "NA")]) > 0)
+ethnicity$"Only White or Asian" <- !(rowSums(ethnicity[, c("Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "NA")]) > 0)
+
+View(ethnicity)
 ```
 
 ## Question breakdown
