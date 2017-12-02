@@ -24,6 +24,7 @@ library(tibble)
 library(reshape2)
 library(tidyr)
 library(stringi)
+library(likert)
 ```
 
 
@@ -176,10 +177,12 @@ data <- cbind(data, ethnicity[, -1])
 stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "natsci", "nat sci", "natural sci", "math", "chem",
                           # The fun ones:
                           "Marine Science", "Conputer Science")
-data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
+data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
 
+
+```{r to_three_groups}
 to_three_averages <- function(fctr){
   levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
   return(fctr)
@@ -189,9 +192,6 @@ to_three_agrees <- function(fctr){
   levels(fctr) <- c("Agree", "Disagree", "Neutral", "Agree", "Disagree")
   return(fctr)
 }
-
-```{r to_three_groups}
-
 ```
 
 ## Contingency tables and test of association
@@ -216,21 +216,22 @@ chisq.test(gender_vs_social_group_perception)
 
 ## Goodness of Fit 
 
+For the comparison of two groups on an ordinal response, 
+
+
 Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
 
 ## Logistic Regression
-
-## Comparisons to national statistics
-
-For the comparison of two groups on an ordinal response, 
 
 # Results
 
 
 
+# Appendix
+
 ## Appendix: Question breakdown
 
-<<<<<<< HEAD
+
 ## Question breakdown
 ### Question 1: What gender do you identify as?
 ```{r}
@@ -242,7 +243,7 @@ colnames(gender) <- "options"
 ggplot(gender,aes(options)) + geom_bar()
 ```
 
-### Question 2: What is your race/ethnicity?
+## Question 2: What is your race/ethnicity?
 ```{r}
 library(cluster)
 library(reshape2)
@@ -256,31 +257,60 @@ race_ethnicity_counts <- data.frame(colSums(race_ethnicity))
 colnames(race_ethnicity_counts) <- "Frequency" 
 race_ethnicity_counts <- rbind(race_ethnicity_counts, sum(multiethnic))
 rownames(race_ethnicity_counts)[6] <- "Multiethnic"
-
- 
 ```
-### Question 3: What is your year at New College?
+
+## Question 3: What is your year at New College?
 ```{r}
 year <- ggplot(data, aes(Q3))
 year + geom_bar()
 ```
 
-### Question 4: What is your Area of Concentration?
+## Question 4: What is your Area of Concentration?
 
-### Question 5: Which math classes have you taken at New College?
+## Question 5: Which math classes have you taken at New College?
 
-### Question 6: Are you considering, or did you ever consider a concentration in Math?
+## Question 6: Are you considering, or did you ever consider a concentration in Math?
 ```{r}
-q6 <- ggplot(data, aes(Q6,fill = factor(Q1))) 
-q6 + geom_bar()
+q6 <- ggplot(data, aes(Q1,fill = factor(Q6))) 
+q6 + geom_bar(position="fill") + coord_flip()
 
 ```
 
-### Question 7: Are you interested in graduate school, in any discipline?
+## Question 7: Are you interested in graduate school, in any discipline?
 ```{r}
-q7 <- ggplot(data, aes(Q7,fill = factor(Q1))) 
-q7 + geom_bar()
+q7 <- ggplot(data, aes(Q1,fill = factor(Q7))) 
+q7 + geom_bar(position="fill") + coord_flip()
 ```
 
 ### Question 8: "I find mathematics interesting."
+```{r}
+l <- likert(data.frame(data$Q8),grouping=data$Q1)
+likert.bar.plot(l)
+
+
+levels(data$Q8)
+data$Q8 <-  factor(data$Q8,levels(data$Q8)[c(5,2,3,1,4)])
+
+q8 <- ggplot(data, aes(Q1,fill = factor(Q8))) 
+q8 + geom_bar(position="fill") + coord_flip()
+```
+### Question 9: "Mathematics leads to many possible career opportunities."
+```{r}
+levels(data$Q9)
+data$Q9 <-  factor(data$Q9,levels(data$Q9)[c(2,3,1,4)])
+
+
+q9 <- ggplot(data, aes(Q1,fill = factor(Q9))) 
+q9 + geom_bar(position="fill") + coord_flip()
+```
+
+### Question 10: "With practice it is easy for me to improve my skills in math."
+```{r}
+levels(data$Q10)
+data$Q10 <-  factor(data$Q10,levels(data$Q10)[c(5,2,3,1,4)])
+
+
+q10 <- ggplot(data, aes(Q1,fill = factor(Q10))) 
+q10 + geom_bar(position="fill") + coord_flip()
+```
 
