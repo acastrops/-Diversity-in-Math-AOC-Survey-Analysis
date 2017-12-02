@@ -23,6 +23,7 @@ library(ggplot2)
 library(tibble)
 library(reshape2)
 library(tidyr)
+library(stringi)
 ```
 
 
@@ -118,7 +119,7 @@ raw_data <- read.csv("survey_responses.csv",nrows = 264)
 num_questions <- ncol(raw_data)
 questions <- data.frame(colnames(raw_data))
 new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
-colnames(data) <- new_col_names
+colnames(raw_data) <- new_col_names
 data_dictionary <- data.frame(cbind(questions,new_col_names))
 data <- raw_data #save raw data with new column names to "data" which will be normalized
 ```
@@ -138,6 +139,7 @@ data$Q1 <- gender_col
 ```{r ethnicity_cleanup}
 ethnicity <- data.frame(data$Q2)
 colnames(ethnicity) <- c("ethnicity_list")
+
 ethnicity[ethnicity$ethnicity_list %in% c("Arab", "Middle Eastern"), ] <- "White"
 ethnicity[ethnicity$ethnicity_list == "Black or African American, Hispanic or Latino, Multi-Racial", ] <- "Black or African American, Hispanic or Latino"
 ethnicity[ethnicity$ethnicity_list == "Mixed, Jamaican/Itailian/Chinese", ] <- "Asian, Black or African American, White"
@@ -167,7 +169,10 @@ data <- cbind(data, ethnicity[, -1])
 
 
 ```{r aoc_normalize}
-data$What.is.your.Area.of.Concentration...If.not.yet.declared..put..Undeclared..
+stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "natsci", "nat sci", "natural sci", "math", "chem",
+                          # The fun ones:
+                          "Marine Science", "Conputer Science")
+data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
 ## Results
