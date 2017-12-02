@@ -222,7 +222,7 @@ chisq.test(gender_vs_social_group_perception)
 
 ## Appendix: Question breakdown
 
-<<<<<<< HEAD
+
 ## Question breakdown
 ### Question 1: What gender do you identify as?
 ```{r}
@@ -275,4 +275,24 @@ q7 + geom_bar()
 ```
 
 ### Question 8: "I find mathematics interesting."
+```{r}
+l <- likert(data.frame(data$Q8),grouping=data$Q1)
+likert.bar.plot(l)
+
+levels(data$Q8)
+data$Q8 <-  factor(data$Q8,levels(data$Q8)[c(5,2,3,1,4)])
+
+
+q8 <- ggplot(data, aes(Q8,fill = factor(Q1))) 
+q8 + geom_bar(position="fill") 
+```
+### Question 9: "Mathematics leads to many possible career opportunities."
+```{r}
+levels(data$Q9)
+data$Q9 <-  factor(data$Q9,levels(data$Q9)[c(2,3,1,4)])
+
+
+q9 <- ggplot(data, aes(Q9,fill = factor(Q1))) 
+q9 + geom_bar(position="fill")
+```
 
