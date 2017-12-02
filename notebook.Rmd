@@ -176,7 +176,7 @@ data <- cbind(data, ethnicity[, -1])
 stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "natsci", "nat sci", "natural sci", "math", "chem",
                           # The fun ones:
                           "Marine Science", "Conputer Science")
-data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
+data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
 
