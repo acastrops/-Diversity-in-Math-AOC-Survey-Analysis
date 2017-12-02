@@ -14,21 +14,22 @@ output:
 
 ```{r setup, include=FALSE}
 # Loading packages we will be using
-library(lodown)
+# library(lodown)
 library(srvyr)
 library(psych)
 library(shiny)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(survey)
 
-# Please run these lines in your console before beginning:
-install.packages( "devtools" , repos = "http://cran.rstudio.com/" )
-library(devtools)
-install_github( "ajdamico/lodown" , dependencies = TRUE )
-
-# The R srvyr package by Greg Freedman Ellis allows dplyr-like syntax for many survey package commands.
-install.packages( "srvyr" , repos = "http://cran.rstudio.com/" )
+# # Please run these lines in your console before beginning:
+# install.packages( "devtools" , repos = "http://cran.rstudio.com/" )
+# library(devtools)
+# install_github( "ajdamico/lodown" , dependencies = TRUE )
+# 
+# # The R srvyr package by Greg Freedman Ellis allows dplyr-like syntax for many survey package commands.
+# install.packages( "srvyr" , repos = "http://cran.rstudio.com/" )
 ```
 
 
@@ -67,9 +68,30 @@ Suggestions from Melissa:
 ### Setting up data
 
 ```{r data}
-## Reading data in
-data <- read.csv(survey_responses.csv)
+## Reading data in, 
+data <- read.csv("~/Documents/StatInference1/Diversity-in-Math-AOC-Survey-Analysis/survey_responses.csv")
 ```
+
+```{r}
+# Reassigning column names, and creating dictionary for new column names
+data = data[1:264,] #last 100 rows are blank
+num_questions <- ncol(data)
+questions <- data.frame(colnames(data))
+new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
+colnames(data) <- new_col_names
+data_dictionary <- data.frame(cbind(questions,new_col_names))
+```
+
+
+```{r}
+# normalize gender column into binary data based on whether the responder reported their gender as "Male"
+gender_col <- as.character(data$Q1)
+non_male <- gender_col != "Male"
+gender_col[non_male] <-  "Not Male"
+gender_col <- as.factor(gender_col)
+data$Q1 <- gender_col
+```
+
 
 ## Question breakdown
 
