@@ -196,6 +196,24 @@ to_three_agrees <- function(fctr){
 
 ## Contingency tables and test of association
 
+To evaluate whether there is a connection between masculinity and confidence in mathematical ability among the New College student body, we produced crosstabs of question responses by respondents' masculine identity, and then conducted chi-squared tests of independence to evaluate whether there was an association.
+
+In the case of question 17 ("How would you rate your mathematical ability, compared to your social group?"), we first needed to consolidate the five response groups into three (The chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average, the actual EV is `r sum(gender_vs_social_group_perception["Male",])*sum(gender_vs_social_group_perception[, "Well below average"])/sum(gender_vs_social_group_perception)`).
+
+```{r crosstab_socialgroup_example, eval=FALSE}
+gender_vs_social_group_perception <- table(data$Q1, data$Q17)
+gender_vs_social_group_perception
+```
+
+With this new table we do not find a significant difference in respondents.
+
+```{r crosstab_socialgroup_3groups}
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception
+chisq.test(gender_vs_social_group_perception)
+#mantelhaen.test(gender_vs_social_group_perception)
+```
+
 ## Goodness of Fit 
 
 Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
@@ -209,16 +227,6 @@ For the comparison of two groups on an ordinal response,
 # Results
 
 
-```{r crosstab_socialgroup_example, eval=FALSE}
-gender_vs_social_group_perception <- table(data$Q1, data$Q17)
-gender_vs_social_group_perception
-```
-
-```{r crosstab_socialgroup_3groups}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
-gender_vs_social_group_perception
-chisq.test(gender_vs_social_group_perception)
-```
 
 ## Appendix: Question breakdown
 
