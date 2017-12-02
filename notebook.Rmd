@@ -205,7 +205,7 @@ gender_vs_social_group_perception <- table(data$Q1, data$Q17)
 gender_vs_social_group_perception
 ```
 
-With this new table we do not find a significant difference in respondents.
+When performing a chi-squared test of independence, we do not find a significant result. We cannot conclude that a student's gender leads to a different response on this survey question.
 
 ```{r crosstab_socialgroup_3groups}
 gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
