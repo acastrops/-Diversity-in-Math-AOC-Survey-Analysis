@@ -33,3 +33,6 @@ vignettes/*.pdf
 *.knit.md
 .Ruserdata
 .Rproj.user
+
+# stop tracking the HTML file... for now
+notebook.nb.html
