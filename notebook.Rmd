@@ -175,9 +175,18 @@ stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "nat
 data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
+```{r to_three_groups}
+
+```
+
 ## Results
 
 
+```{r crosstab_socialgroup_example, eval=FALSE}
+gender_vs_social_group_perception <- table(data$Q1, data$Q17)
+gender_vs_social_group_perception
+chisq.test(gender_vs_social_group_perception)
+```
 
 
 %--------------------------------------------------------------------
