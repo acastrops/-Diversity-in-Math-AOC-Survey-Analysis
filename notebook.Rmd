@@ -95,7 +95,7 @@ Agree with statements as presented
 +  It could be interesting for your project to try (for example) to see what you find when you compare the means of two groups vs the medians of two groups. Or what do you find if you do a t-test vs a MW test? etc.
 
 
-## Setting up data
+## Cleaning up data
 
 ```{r read_data}
 ## Reading data in
@@ -178,6 +178,14 @@ to_three_agrees <- function(fctr){
 }
 
 ```
+
+## Contingency tables and test of association
+
+## Goodness of Fit 
+
+## Logistic Regression
+
+## Comparisons to national statistics
 
 ## Results
 
