@@ -132,8 +132,8 @@ gender_col <- as.factor(gender_col)
 data$Q1 <- gender_col
 ```
 
-```{r}
-ethnicity <- data.frame(data$What.is.your.race.ethnicity...Check.all.that.apply.)
+```{r ethnicity_cleanup}
+ethnicity <- data.frame(data$Q2)
 colnames(ethnicity) <- c("ethnicity_list")
 ethnicity[ethnicity$ethnicity_list %in% c("Arab", "Middle Eastern"), ] <- "White"
 ethnicity[ethnicity$ethnicity_list == "Black or African American, Hispanic or Latino, Multi-Racial", ] <- "Black or African American, Hispanic or Latino"
@@ -141,17 +141,18 @@ ethnicity[ethnicity$ethnicity_list == "Mixed, Jamaican/Itailian/Chinese", ] <- "
 ethnicity[ethnicity$ethnicity_list %in% c("Alien", "I do not wish to declare my race/ethnicity", ""), ] <- NA
 ethnicity$ethnicity_list <- droplevels(ethnicity$ethnicity_list)
 
+# Get the right ethnic groups
 ethnicity_groups <- levels(ethnicity$ethnicity_list) %>% strsplit(", ") %>% unlist %>% unique
 ethnicity_groups <- ethnicity_groups[!grepl(",", ethnicity_groups)]
 
-
+# Recast the ethnicity table with the comma-separated list into a new table
 ethnicity <- ethnicity %>%
   rowid_to_column("id") %>%
   mutate(ethnic_group = strsplit(as.character(ethnicity_list), ", ")) %>%
   unnest() %>%
   dcast(id ~ ethnic_group)
 
-# we get "White" and NA in the white column
+# we get "White" and NA in the white column, for example
 ethnicity[, -1] <- !is.na(ethnicity)[,-1]
 
 # 2 new columns, non-hispanic white and only white or asian
@@ -159,6 +160,10 @@ ethnicity$"Non-Hispanic White" <- !(rowSums(ethnicity[, c("Asian", "Black or Afr
 ethnicity$"Only White or Asian" <- !(rowSums(ethnicity[, c("Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "NA")]) > 0)
 
 data <- cbind(data, ethnicity[, -1])
+```
+
+```{r aoc_normalize}
+data$What.is.your.Area.of.Concentration...If.not.yet.declared..put..Undeclared..
 ```
 
 ## Question breakdown
