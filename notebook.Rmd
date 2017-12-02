@@ -66,15 +66,25 @@ First, Likert scales are arbitrary; the value assigned to an item has no objecti
 
 The second major problem is whether the "distance" between each Likert item is equivalent. A good Likert scale will present a symmetry of categories about a midpoint with clearly defined linguistic qualifiers.
 
-- Non-response bias
+- **Non-response bias**
 
 The phenomenon that the required information is not obtained from the people selected in the sample.
 
-- Social Desirability and acquiescence bias
+- **Social Desirability and acquiescence bias**
 
 Respondents may avoid using extreme response categories out of a desire of being perceived as having extremist views
 
-Agree with statements as presented
+Agree with statements as presented ...
+
+
+- **Sample size and power** 
+The probability of not getting false positives is affected by three factors:
+
++ **Sample size (n)** The greater the sample size, the greater the power.  In our case, Other things being equal, the number of responses (264) represents 31% of currently enrolled students at New College. 
+
++ **Significance level ($\alpha$)** The higher the significance level, the higher the power of the test. Increasing the significance level reduces the region of acceptance. As a result, we are more likely to reject the null hypothesis; i.e., we are less likely to accept the null hypothesis when it is false, or making a Type II error. This increases the statistical power of the test.
+
++ **The "true" value of the parameter being tested** The greater the difference between the "true" value of a parameter and the value specified in the null hypothesis, the greater the power of the test. That is, the greater the effect size, the greater the power of the test.
 
 ### Corrections
 
@@ -102,6 +112,8 @@ Agree with statements as presented
 raw_data <- read.csv("survey_responses.csv",nrows = 264)
 ```
 
+
+
 ```{r create_dictionary}
 ## Reassigning column names, and creating dictionary for new column names
 num_questions <- ncol(raw_data)
@@ -115,6 +127,7 @@ data <- raw_data
 ```
 
 
+
 ```{r normalizing_gender}
 ## Normalize gender column into binary data based on whether the responder reported their gender as "Male"
 gender_col <- as.character(data$Q1)
@@ -125,7 +138,8 @@ data$Q1 <- gender_col
 ```
 
 
-```{r ethnicity_cleanup}
+
+```{r normalizing_ethnicity}
 ethnicity <- data.frame(data$Q2)
 colnames(ethnicity) <- c("ethnicity_list")
 
@@ -158,14 +172,13 @@ data <- cbind(data, ethnicity[, -1])
 
 
 
-```{r aoc_normalize}
+```{r normalizing_aoc}
 stem_search_criteria <- c("bio", "comp sci", "compsci", "computer", "data", "natsci", "nat sci", "natural sci", "math", "chem",
                           # The fun ones:
                           "Marine Science", "Conputer Science")
 data$is_stem_aoc <- stri_detect_regex(aoc, paste(stem_search_criteria, collapse='|'), case_insensitive=TRUE)
 ```
 
-```{r to_three_groups}
 
 to_three_averages <- function(fctr){
   levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
@@ -177,17 +190,23 @@ to_three_agrees <- function(fctr){
   return(fctr)
 }
 
+```{r to_three_groups}
+
 ```
 
 ## Contingency tables and test of association
 
 ## Goodness of Fit 
 
+Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
+
 ## Logistic Regression
 
 ## Comparisons to national statistics
 
-## Results
+For the comparison of two groups on an ordinal response, 
+
+# Results
 
 
 ```{r crosstab_socialgroup_example, eval=FALSE}
@@ -201,14 +220,9 @@ gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 ```
 
-%--------------------------------------------------------------------
-```{r}
-plot(cars)
-```
+## Appendix: Question breakdown
 
-
-## Question breakdown
-### Question 1: What is your 
+## Question 1: What is your 
 ```{r}
 
 ```
