@@ -118,7 +118,7 @@ raw_data <- read.csv("survey_responses.csv",nrows = 264)
 num_questions <- ncol(raw_data)
 questions <- data.frame(colnames(raw_data))
 new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
-colnames(data) <- new_col_names
+colnames(raw_data) <- new_col_names
 data_dictionary <- data.frame(cbind(questions,new_col_names))
 data <- raw_data #save raw data with new column names to "data" which will be normalized
 ```
@@ -177,7 +177,58 @@ plot(cars)
 
 
 ## Question breakdown
-### Question 1: What is your 
+### Question 1: What gender do you identify as?
+```{r}
+other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
+gender <- as.character(raw_data$Q1)
+gender[other] <- "Other"
+gender <- data.frame((as.factor(gender)))
+colnames(gender) <- "options"
+ggplot(gender,aes(options)) + geom_bar()
+```
+
+### Question 2: What is your race/ethnicity?
+```{r}
+library(cluster)
+library(reshape2)
+race_ethnicity <- sapply(data[,ethnicity_groups],as.integer)
+
+multiethnic <- rowSums(race_ethnicity) > 1
+
+race_ethnicity <- race_ethnicity[!multiethnic,]
+
+race_ethnicity_counts <- data.frame(colSums(race_ethnicity))
+colnames(race_ethnicity_counts) <- "Frequency" 
+race_ethnicity_counts <- rbind(race_ethnicity_counts, sum(multiethnic))
+rownames(race_ethnicity_counts)[6] <- "Multiethnic"
+
+ 
+```
+### Question 3: What is your year at New College?
+```{r}
+year <- ggplot(data, aes(Q3))
+year + geom_bar()
+```
+
+### Question 4: What is your Area of Concentration?
+
+### Question 5: Which math classes have you taken at New College?
+
+### Question 6: Are you considering, or did you ever consider a concentration in Math?
+```{r}
+q6 <- ggplot(data, aes(Q6,fill = factor(Q1))) 
+q6 + geom_bar()
+
+```
+
+### Question 7: Are you interested in graduate school, in any discipline?
+```{r}
+q7 <- ggplot(data, aes(Q7,fill = factor(Q1))) 
+q7 + geom_bar()
+```
+
+### Question 8: "I find mathematics interesting."
+
 ```{r}
 
 ```
