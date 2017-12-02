@@ -185,9 +185,13 @@ to_three_agrees <- function(fctr){
 ```{r crosstab_socialgroup_example, eval=FALSE}
 gender_vs_social_group_perception <- table(data$Q1, data$Q17)
 gender_vs_social_group_perception
-chisq.test(gender_vs_social_group_perception)
 ```
 
+```{r crosstab_socialgroup_3groups}
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception
+chisq.test(gender_vs_social_group_perception)
+```
 
 %--------------------------------------------------------------------
 ```{r}
