@@ -223,8 +223,11 @@ chisq.test(gender_vs_social_group_perception)
 
 ## Appendix: Question breakdown
 
+## Question breakdown  
 
-## Question breakdown
+Plan: Include plots for each question that describes the distribution of responses, grouped by either gender of ethnicity where appropriate, and interpret each figure.  See Question 6 and 8 for an example of the plots and interpretations. 
+
+
 ### Question 1: What gender do you identify as?
 ```{r}
 other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
@@ -235,10 +238,9 @@ colnames(gender) <- "options"
 ggplot(gender,aes(options)) + geom_bar()
 ```
 
+
 ## Question 2: What is your race/ethnicity?
 ```{r}
-library(cluster)
-library(reshape2)
 race_ethnicity <- sapply(data[,ethnicity_groups],as.integer)
 
 multiethnic <- rowSums(race_ethnicity) > 1
@@ -249,6 +251,7 @@ race_ethnicity_counts <- data.frame(colSums(race_ethnicity))
 colnames(race_ethnicity_counts) <- "Frequency" 
 race_ethnicity_counts <- rbind(race_ethnicity_counts, sum(multiethnic))
 rownames(race_ethnicity_counts)[6] <- "Multiethnic"
+
 ```
 
 ## Question 3: What is your year at New College?
@@ -258,8 +261,10 @@ year + geom_bar()
 ```
 
 ## Question 4: What is your Area of Concentration?
+To be included: plot describing distribution of AOC's 
 
 ## Question 5: Which math classes have you taken at New College?
+To be included: plot describing distribution of math classes taken by the respondents
 
 ## Question 6: Are you considering, or did you ever consider a concentration in Math?
 ```{r}
@@ -267,6 +272,7 @@ q6 <- ggplot(data, aes(Q1,fill = factor(Q6)))
 q6 + geom_bar(position="fill") + coord_flip()
 
 ```
+This plot shows that a larger percentage of the male respondents have considered an AOC in mathematics than the non-male respondents.
 
 ## Question 7: Are you interested in graduate school, in any discipline?
 ```{r}
@@ -286,6 +292,8 @@ data$Q8 <-  factor(data$Q8,levels(data$Q8)[c(5,2,3,1,4)])
 q8 <- ggplot(data, aes(Q1,fill = factor(Q8))) 
 q8 + geom_bar(position="fill") + coord_flip()
 ```
+While the majority of both male and non-male groups find math interesting, that majority is larger in the group of male respondents.  
+
 ### Question 9: "Mathematics leads to many possible career opportunities."
 ```{r}
 levels(data$Q9)
@@ -306,3 +314,28 @@ q10 <- ggplot(data, aes(Q1,fill = factor(Q10)))
 q10 + geom_bar(position="fill") + coord_flip()
 ```
 
+### Question 11: "Men are generally better suited to mathematics than women."
+```{r}
+levels(data$Q11)
+data$Q11 <-  factor(data$Q11,levels(data$Q11)[c(5,2,3,1,4)])
+
+
+q11 <- ggplot(data, aes(Q1,fill = factor(Q11))) 
+q11 + geom_bar(position="fill") + coord_flip()
+```
+### Question 12: "Many people believe that men are better suited to mathematics than women."
+```{r}
+levels(data$Q12)
+data$Q12 <-  factor(data$Q12,levels(data$Q12)[c(5,2,3,1,4)])
+
+
+q12 <- ggplot(data, aes(Q1,fill = factor(Q12))) 
+q12 + geom_bar(position="fill") + coord_flip()
+```
+### Question 13: "Some racial ethnic groups are generally better suited to mathematics than others."
+
+```{r}
+# include plot where everything is grouped by ethnicity instead of gender
+```
+
+### Question 14: 
