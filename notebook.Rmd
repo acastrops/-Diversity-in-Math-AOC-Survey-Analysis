@@ -24,6 +24,7 @@ library(tibble)
 library(reshape2)
 library(tidyr)
 library(stringi)
+library(likert)
 ```
 
 
@@ -263,15 +264,15 @@ year + geom_bar()
 
 ### Question 6: Are you considering, or did you ever consider a concentration in Math?
 ```{r}
-q6 <- ggplot(data, aes(Q6,fill = factor(Q1))) 
-q6 + geom_bar()
+q6 <- ggplot(data, aes(Q1,fill = factor(Q6))) 
+q6 + geom_bar(position="fill") + coord_flip()
 
 ```
 
 ### Question 7: Are you interested in graduate school, in any discipline?
 ```{r}
-q7 <- ggplot(data, aes(Q7,fill = factor(Q1))) 
-q7 + geom_bar()
+q7 <- ggplot(data, aes(Q1,fill = factor(Q7))) 
+q7 + geom_bar(position="fill") + coord_flip()
 ```
 
 ### Question 8: "I find mathematics interesting."
@@ -279,12 +280,12 @@ q7 + geom_bar()
 l <- likert(data.frame(data$Q8),grouping=data$Q1)
 likert.bar.plot(l)
 
+
 levels(data$Q8)
 data$Q8 <-  factor(data$Q8,levels(data$Q8)[c(5,2,3,1,4)])
 
-
-q8 <- ggplot(data, aes(Q8,fill = factor(Q1))) 
-q8 + geom_bar(position="fill") 
+q8 <- ggplot(data, aes(Q1,fill = factor(Q8))) 
+q8 + geom_bar(position="fill") + coord_flip()
 ```
 ### Question 9: "Mathematics leads to many possible career opportunities."
 ```{r}
@@ -292,7 +293,17 @@ levels(data$Q9)
 data$Q9 <-  factor(data$Q9,levels(data$Q9)[c(2,3,1,4)])
 
 
-q9 <- ggplot(data, aes(Q9,fill = factor(Q1))) 
-q9 + geom_bar(position="fill")
+q9 <- ggplot(data, aes(Q1,fill = factor(Q9))) 
+q9 + geom_bar(position="fill") + coord_flip()
+```
+
+### Question 10: "With practice it is easy for me to improve my skills in math."
+```{r}
+levels(data$Q10)
+data$Q10 <-  factor(data$Q10,levels(data$Q10)[c(5,2,3,1,4)])
+
+
+q10 <- ggplot(data, aes(Q1,fill = factor(Q10))) 
+q10 + geom_bar(position="fill") + coord_flip()
 ```
 
