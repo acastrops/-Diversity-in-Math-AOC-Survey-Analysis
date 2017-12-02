@@ -109,22 +109,23 @@ Standard inference is based on large-sample asymptotics
 
 ```{r data}
 ## Reading data in
-data <- read.csv("survey_responses.csv")
+raw_data <- read.csv("survey_responses.csv",nrows = 264)
 ```
 
 ```{r}
 # Reassigning column names, and creating dictionary for new column names
-data = data[1:264,] #last 100 rows are blank
-num_questions <- ncol(data)
-questions <- data.frame(colnames(data))
+num_questions <- ncol(raw_data)
+questions <- data.frame(colnames(raw_data))
 new_col_names <- paste("Q",as.character(c(1:num_questions)),sep = "")
 colnames(data) <- new_col_names
 data_dictionary <- data.frame(cbind(questions,new_col_names))
+data <- raw_data #save raw data with new column names to "data" which will be normalized
 ```
 
 
 ```{r}
 # normalize gender column into binary data based on whether the responder reported their gender as "Male"
+
 gender_col <- as.character(data$Q1)
 non_male <- gender_col != "Male"
 gender_col[non_male] <-  "Not Male"
@@ -133,7 +134,8 @@ data$Q1 <- gender_col
 ```
 
 ```{r}
-ethnicity <- data.frame(data$What.is.your.race.ethnicity...Check.all.that.apply.)
+data <- raw_data
+ethnicity <- data.frame(data$Q2)
 colnames(ethnicity) <- c("ethnicity_list")
 ethnicity[ethnicity$ethnicity_list %in% c("Arab", "Middle Eastern"), ] <- "White"
 ethnicity[ethnicity$ethnicity_list == "Black or African American, Hispanic or Latino, Multi-Racial", ] <- "Black or African American, Hispanic or Latino"
@@ -161,7 +163,6 @@ ethnicity$"Only White or Asian" <- !(rowSums(ethnicity[, c("Black or African Ame
 data <- cbind(data, ethnicity[, -1])
 ```
 
-## Question breakdown
 
 ## Results
 
@@ -172,8 +173,9 @@ data <- cbind(data, ethnicity[, -1])
 plot(cars)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+## Question breakdown
+### Question 1: What is your 
+```{r}
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```
