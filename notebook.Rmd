@@ -227,10 +227,7 @@ chisq.test(gender_vs_social_group_perception)
 # Appendix
 
 ## Appendix: Question breakdown
-
-## Question breakdown  
-
-```{r plot_prep, echo=FALSE}
+```{r plot_prep, echo=FALSE, results='hide'}
 plot_data <- data
 
 assign_ethnicity <- function(record) {
@@ -290,12 +287,8 @@ plot_by_ethnicity <- function(question_col,question_title) {
 }
 ```
 
-
-Plan: Include plots for each question that describes the distribution of responses, grouped by either gender of ethnicity where appropriate, and interpret each figure.  See Question 6 and 8 for an example of the plots and interpretations. 
-
-
 ### Question 1: What gender do you identify as?
-```{r}
+```{r plot_q1, echo=FALSE, fig.keep='all'}
 other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
 gender <- as.character(raw_data$Q1)
 gender[other] <- "Other"
@@ -304,36 +297,34 @@ colnames(gender) <- "Gender"
 ggplot(gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE)
 ```
 
-
-## Question 2: What is your race/ethnicity?
-```{r}
-q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
-q2 + geom_bar() + coord_flip()
+### Question 2: What is your race/ethnicity?
+```{r plot_q2, echo=FALSE, fig.keep='all'}
+plot_q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
+plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE)
 ```
 
-## Question 3: What is your year at New College?
-```{r}
+### Question 3: What is your year at New College?
+```{r plot_q3, echo=FALSE, fig.keep='all'}
 plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
 plot_q3 + geom_bar() + xlab('Year') + guides(fill=guide_legend(title="What is your year?"))
 ```
 
-## Question 4: What is your Area of Concentration?
-To be included: plot describing distribution of AOC's 
+<!-- ## Question 4: What is your Area of Concentration? -->
+<!-- To be included: plot describing distribution of AOC's  -->
 
-## Question 5: Which math classes have you taken at New College?
-To be included: plot describing distribution of math classes taken by the respondents
+<!-- ## Question 5: Which math classes have you taken at New College? -->
+<!-- To be included: plot describing distribution of math classes taken by the respondents -->
 
-## Question 6: Are you considering, or did you ever consider a concentration in Math?
-```{r}
+### Question 6: Are you considering, or did you ever consider a concentration in Math?
+```{r plot_q6, echo=FALSE, fig.keep='all'}
 q6_data <- plot_data$Q6
 q6_title <- "Ever consider AOC\nin Math?"
 plot_by_gender(q6_data,q6_title)
 plot_by_ethnicity(q6_data,q6_title)
 ```
-This plot shows that a larger percentage of the male respondents have considered an AOC in mathematics than the non-male respondents.
 
-## Question 7: Are you interested in graduate school, in any discipline?
-```{r}
+### Question 7: Are you interested in graduate school, in any discipline?
+```{r plot_q7, echo=FALSE, fig.keep='all'}
 q7_data <- plot_data$Q7
 q7_title <- "Interested in\ngrad school?"
 plot_by_gender(q7_data,q7_title)
@@ -341,7 +332,7 @@ plot_by_ethnicity(q7_data,q7_title)
 ```
 
 ### Question 8: "I find mathematics interesting."
-```{r}
+```{r plot_q8, echo=FALSE, fig.keep='all'}
 # l <- likert(data.frame(data$Q8),grouping=data$Q1)
 # likert.bar.plot(l)
 q8_data <- plot_data$Q8
@@ -349,10 +340,9 @@ q8_title <- "I find math\ninteresting."
 plot_by_gender(q8_data,q8_title)
 plot_by_ethnicity(q8_data,q8_title)
 ```
-While the majority of both male and non-male groups find math interesting, that majority is larger in the group of male respondents.  
 
 ### Question 9: "Mathematics leads to many possible career opportunities."
-```{r}
+```{r plot_q9, echo=FALSE, fig.keep='all'}
 q9_data <- plot_data$Q9
 q9_title <- "Math leads to many\ncareer opportunities."
 plot_by_gender(q9_data,q9_title)
@@ -360,7 +350,7 @@ plot_by_ethnicity(q9_data,q9_title)
 ```
 
 ### Question 10: "With practice it is easy for me to improve my skills in math."
-```{r}
+```{r plot_q10, echo=FALSE, fig.keep='all'}
 q10_data <- plot_data$Q10
 q10_title <- "It is easy to improve\nmy math skills with\npractice"
 plot_by_gender(q10_data,q10_title)
@@ -368,22 +358,23 @@ plot_by_ethnicity(q10_data,q10_title)
 ```
 
 ### Question 11: "Men are generally better suited to mathematics than women."
-```{r}
+```{r plot_q11, echo=FALSE, fig.keep='all'}
 q11_data <- plot_data$Q11
 q11_title <- "Men are generally\nbetter at math."
 plot_by_gender(q11_data,q11_title)
 plot_by_ethnicity(q11_data,q11_title)
 ```
+
 ### Question 12: "Many people believe that men are better suited to mathematics than women."
-```{r}
+```{r plot_q12, echo=FALSE, fig.keep='all'}
 q12_data <- plot_data$Q12
 q12_title <- "Many believe that\nmen are generally\nbetter at math."
 plot_by_gender(q12_data,q12_title)
 plot_by_ethnicity(q12_data,q12_title)
 ```
-### Question 13: "Some racial ethnic groups are generally better suited to mathematics than others."
 
-```{r}
+### Question 13: "Some racial ethnic groups are generally better suited to mathematics than others."
+```{r plot_q13, echo=FALSE, fig.keep='all'}
 q13_data <- plot_data$Q13
 q13_title <- "Some racial ethnic\ngroups are generally\nbetter at math."
 plot_by_gender(q13_data,q13_title)
@@ -391,7 +382,7 @@ plot_by_ethnicity(q13_data,q13_title)
 ```
 
 ### Question 14: "Many people believe that some racial ethnic groups are better suited to mathematics than others."
-```{r}
+```{r plot_q14, echo=FALSE, fig.keep='all'}
 q14_data <- plot_data$Q14
 q14_title <- "Many believe that\nsome racial ethnic\ngroups are generally\nbetter at math."
 plot_by_gender(q14_data,q14_title)
@@ -399,16 +390,15 @@ plot_by_ethnicity(q14_data,q14_title)
 ```
 
 ### Question 15: Rate your mathematical ability compared to your high school student population.
-```{r}
+```{r plot_q15, echo=FALSE, fig.keep='all'}
 q15_data <- plot_data$Q15
 q15_title <- "Rate your math skills\ncompared to your high\nschool population."
 plot_by_gender(q15_data,q15_title)
 plot_by_ethnicity(q15_data,q15_title)
 ```
 
-
 ### Question 16: Rate your mathematical ability compared to the student population at New College.
-```{r}
+```{r plot_q16, echo=FALSE, fig.keep='all'}
 q16_data <- plot_data$Q16
 q16_title <- "Rate your math skills\ncompared to New\nCollege population."
 plot_by_gender(q16_data,q16_title)
@@ -416,7 +406,7 @@ plot_by_ethnicity(q16_data,q16_title)
 ```
 
 ### Question 17: Rate your mathematical ability compared to your social group.
-```{r}
+```{r plot_q17, echo=FALSE, fig.keep='all'}
 q17_data <- plot_data$Q17
 q17_title <- "Rate your math skills\ncompared to your\nsocial group."
 plot_by_gender(q17_data,q17_title)
@@ -424,7 +414,7 @@ plot_by_ethnicity(q17_data,q17_title)
 ```
 
 ### Question 18: Rate your mathematical ability compared to other students of your gender.
-```{r}
+```{r plot_q18, echo=FALSE, fig.keep='all'}
 q18_data <- plot_data$Q18
 q18_title <- "Rate your math skills\ncompared to students\nof your gender."
 plot_by_gender(q18_data,q18_title)
@@ -432,7 +422,7 @@ plot_by_ethnicity(q18_data,q18_title)
 ```
 
 ### Question 19: Rate your mathematical ability compared to other students of your racial ethnic group.
-```{r}
+```{r plot_q19, echo=FALSE, fig.keep='all'}
 q19_data <- plot_data$Q19
 q19_title <- "Rate your math skills\ncompared to students\nof your racial ethnic\ngroup."
 plot_by_gender(q19_data,q19_title)
@@ -440,7 +430,7 @@ plot_by_ethnicity(q19_data,q19_title)
 ```
 
 ### Question 20: Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
-```{r}
+```{r plot_q20, echo=FALSE, fig.keep='all'}
 q20_data <- plot_data$Q20
 q20_title <- "Likelihood of dropping\na difficult math class."
 plot_by_gender(q20_data,q20_title)
@@ -448,7 +438,7 @@ plot_by_ethnicity(q20_data,q20_title)
 ```
 
 ### Question 21: Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
-```{r}
+```{r plot_q21, echo=FALSE, fig.keep='all'}
 q21_data <- plot_data$Q21
 q21_title <- "Ever dropped a\ndifficult math class?"
 plot_by_gender(q21_data,q21_title)
@@ -456,7 +446,7 @@ plot_by_ethnicity(q21_data,q21_title)
 ```
 
 ### Question 22: Compared to other subjects, do you feel more or less anxiety in mathematics classes?
-```{r}
+```{r plot_q22, echo=FALSE, fig.keep='all'}
 q22_data <- plot_data$Q22
 q22_title <- "More or less anxiety\nin math classes?"
 plot_by_gender(q22_data,q22_title)
@@ -464,7 +454,7 @@ plot_by_ethnicity(q22_data,q22_title)
 ```
 
 ### Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?
-```{r}
+```{r plot_q23, echo=FALSE, fig.keep='all'}
 q23_data <- plot_data$Q23
 q23_title <- "Frequency of concerns\nthat your math abilities\nwill confirm negative\nstereotypes?"
 plot_by_gender(q23_data,q23_title)
@@ -472,24 +462,22 @@ plot_by_ethnicity(q23_data,q23_title)
 ```
 
 ### Question 24: Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
-```{r}
+```{r plot_q24, echo=FALSE, fig.keep='all'}
 q24_data <- plot_data$Q24
 q24_title <- "Feel comfortable\nor out of place in\nNCF math class?"
 plot_by_gender(q24_data,q24_title)
 plot_by_ethnicity(q24_data,q24_title)
 ```
 
-
 ### Question 25: Have you ever felt that you were perceived or treated differently in a math class due to your gender?
-```{r}
+```{r plot_q25, echo=FALSE, fig.keep='all'}
 q25_data <- plot_data$Q25
 q25_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour gender?"
 plot_by_gender(q25_data,q25_title) 
 ```
 
-
 ### Question 26: Have you ever felt that you were perceived or treated differently in a math class due to yourrace or ethnicity?
-```{r}
+```{r plot_q26, echo=FALSE, fig.keep='all'}
 q26_data <- plot_data$Q26
 q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
 plot_by_ethnicity(q26_data,q26_title) 
