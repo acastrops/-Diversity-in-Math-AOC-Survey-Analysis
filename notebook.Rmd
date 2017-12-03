@@ -199,6 +199,42 @@ to_three_agrees <- function(fctr){
 }
 ```
 
+```{r order_factors, echo=FALSE}
+mw_data <- data
+colnames(mw_data[,1:27]) <- as.character(questions)
+mw_data$Q6 <-  factor(mw_data$Q6,levels(mw_data$Q6)[c(2,1)], ordered = TRUE)
+levels(mw_data$Q24)
+mw_data$Q7 <-  factor(mw_data$Q7,levels(mw_data$Q7)[c(2,1,3)], ordered = TRUE)
+
+agree_questions <- mw_data[,8:14]
+agree_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,2,3,1,4)], ordered = TRUE))(agree_questions)
+mw_data[,8:14] <- agree_questions
+
+average_questions <- mw_data[,15:19]
+average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,3,2,1,4)], ordered = TRUE))(average_questions)
+mw_data[,15:19] <- average_questions
+
+mw_data$Q20 <- factor(mw_data$Q20,levels(mw_data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
+
+mw_data$Q22 <- factor(mw_data$Q22,levels(mw_data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
+
+mw_data$Q23 <- factor(mw_data$Q23,levels(mw_data$Q23)[c(2,4,3,1)], ordered = TRUE)
+
+mw_data$Q24 <- factor(mw_data$Q24,levels(mw_data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
+
+get_man_whitney <- function(ind_col, dep_col, df) {
+  mw_stat <- wilcox.test(as.integer(dep_col) ~ as.integer(ind_col), data = df)
+  return(mw_stat)
+} 
+
+mw_results <- catcolwise(function(my_col)  get_man_whitney(mw_data$Q1,my_col,mw_data)[3])(mw_data[,3:24])
+
+colnames(mw_results) <- as.character(questions[3:24,1])
+t(unnest(mw_results))
+```
+
+
+
 ## Contingency tables and test of association
 
 ## Goodness of Fit 
@@ -225,19 +261,16 @@ chisq.test(gender_vs_social_group_perception)
 ```
 
 ```{r mann_whitney_q25}
-by_gender <- split(data, data$Q1)
-male_data <- by_gender[[1]]
-non_male_data <- by_gender[[2]]
+mw_data <- data
 
-wilcox.test(as.integer(male_data$Q20),as.integer(non_male_data$Q20))
 
-wilcox.test(as.integer(male_data$Q22),as.integer(non_male_data$Q22))
+levels(mw_data$Q20)
 
-wilcox.test(as.integer(male_data$Q23),as.integer(non_male_data$Q23))
+mw_data$Q20 <- factor(mw_data$Q20,levels(mw_data$Q20)[c(5,3,1,2,4)],ordered = TRUE)
+levels(mw_data$Q20)
 
-wilcox.test(as.integer(male_data$Q24),as.integer(non_male_data$Q24))
+wilcox.test(as.integer(Q20) ~ as.integer(Q1), mw_data)
 
-wilcox.test(as.integer(male_data$Q25),as.integer(non_male_data$Q25))
 ```
 
 
@@ -263,8 +296,6 @@ colnames(overall_race_ethnicity) <- "Race/Ethnicity"
 plot_data <- cbind(plot_data,overall_race_ethnicity)
 plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(5,4,1:3,6)])
 
-plot_data$Q3 <-  factor(plot_data$Q3,levels(plot_data$Q3)[c(2,4,5,3,1)])
-
 plot_data$Q6 <-  factor(plot_data$Q6,levels(plot_data$Q6)[c(2,1)])
 
 plot_data$Q7 <-  factor(plot_data$Q7,levels(plot_data$Q7)[c(3,1,2)])
@@ -284,6 +315,8 @@ plot_data$Q22 <- factor(plot_data$Q22,levels(plot_data$Q22)[c(5,2,3,1,4)])
 plot_data$Q23 <- factor(plot_data$Q23,levels(plot_data$Q23)[c(2,4,3,1)])
 
 plot_data$Q24 <- factor(plot_data$Q24,levels(plot_data$Q24)[c(5,3,1,2,4)])
+
+plot_data$Q3 <-  factor(plot_data$Q3,levels(plot_data$Q3)[c(2,4,5,3,1)])
 
 plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, at NCF & elsewhere","Yes, but not at NCF"))
 
