@@ -230,7 +230,7 @@ chisq.test(gender_vs_social_group_perception)
 
 ## Question breakdown  
 
-```{r, echo=FALSE}
+```{r plot_prep, echo=FALSE}
 plot_data <- data
 
 assign_ethnicity <- function(record) {
@@ -301,7 +301,7 @@ gender <- as.character(raw_data$Q1)
 gender[other] <- "Other"
 gender <- data.frame((as.factor(gender)))
 colnames(gender) <- "Gender"
-ggplot(gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip()
+ggplot(gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE)
 ```
 
 
@@ -326,7 +326,7 @@ To be included: plot describing distribution of math classes taken by the respon
 ## Question 6: Are you considering, or did you ever consider a concentration in Math?
 ```{r}
 q6_data <- plot_data$Q6
-q6_title <- "Ever consider AOC in Math?"
+q6_title <- "Ever consider AOC\nin Math?"
 plot_by_gender(q6_data,q6_title)
 plot_by_ethnicity(q6_data,q6_title)
 ```
@@ -335,7 +335,7 @@ This plot shows that a larger percentage of the male respondents have considered
 ## Question 7: Are you interested in graduate school, in any discipline?
 ```{r}
 q7_data <- plot_data$Q7
-q7_title <- "Interested in grad school?"
+q7_title <- "Interested in\ngrad school?"
 plot_by_gender(q7_data,q7_title)
 plot_by_ethnicity(q7_data,q7_title)
 ```
@@ -345,7 +345,7 @@ plot_by_ethnicity(q7_data,q7_title)
 # l <- likert(data.frame(data$Q8),grouping=data$Q1)
 # likert.bar.plot(l)
 q8_data <- plot_data$Q8
-q8_title <- "I find math interesting."
+q8_title <- "I find math\ninteresting."
 plot_by_gender(q8_data,q8_title)
 plot_by_ethnicity(q8_data,q8_title)
 ```
@@ -362,7 +362,7 @@ plot_by_ethnicity(q9_data,q9_title)
 ### Question 10: "With practice it is easy for me to improve my skills in math."
 ```{r}
 q10_data <- plot_data$Q10
-q10_title <- "It is easy to improve my\nmath skills with practice"
+q10_title <- "It is easy to improve\nmy math skills with\npractice"
 plot_by_gender(q10_data,q10_title)
 plot_by_ethnicity(q10_data,q10_title)
 ```
