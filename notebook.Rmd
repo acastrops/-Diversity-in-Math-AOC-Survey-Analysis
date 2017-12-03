@@ -306,7 +306,7 @@ plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE)
 ### Question 3: What is your year at New College?
 ```{r plot_q3, echo=FALSE, fig.keep='all'}
 plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
-plot_q3 + geom_bar() + xlab('Year') + guides(fill=guide_legend(title="What is your year?"))
+plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE)
 ```
 
 <!-- ## Question 4: What is your Area of Concentration? -->
