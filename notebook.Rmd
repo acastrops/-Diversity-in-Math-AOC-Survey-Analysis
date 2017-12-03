@@ -224,6 +224,23 @@ gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 ```
 
+```{r mann_whitney_q25}
+by_gender <- split(data, data$Q1)
+male_data <- by_gender[[1]]
+non_male_data <- by_gender[[2]]
+
+wilcox.test(as.integer(male_data$Q20),as.integer(non_male_data$Q20))
+
+wilcox.test(as.integer(male_data$Q22),as.integer(non_male_data$Q22))
+
+wilcox.test(as.integer(male_data$Q23),as.integer(non_male_data$Q23))
+
+wilcox.test(as.integer(male_data$Q24),as.integer(non_male_data$Q24))
+
+wilcox.test(as.integer(male_data$Q25),as.integer(non_male_data$Q25))
+```
+
+
 # Appendix
 
 ## Appendix: Question breakdown
