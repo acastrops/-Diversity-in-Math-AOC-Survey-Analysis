@@ -201,9 +201,9 @@ to_three_agrees <- function(fctr){
 
 ```{r order_factors, echo=FALSE}
 mw_data <- data
-colnames(mw_data[,1:27]) <- as.character(questions)
+
 mw_data$Q6 <-  factor(mw_data$Q6,levels(mw_data$Q6)[c(2,1)], ordered = TRUE)
-levels(mw_data$Q24)
+
 mw_data$Q7 <-  factor(mw_data$Q7,levels(mw_data$Q7)[c(2,1,3)], ordered = TRUE)
 
 agree_questions <- mw_data[,8:14]
