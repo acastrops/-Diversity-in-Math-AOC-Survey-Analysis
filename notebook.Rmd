@@ -187,53 +187,48 @@ data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, colla
 
 
 
+```{r order_factors, echo=FALSE}
+## since most responses are on an ordinal scale, this reorders the factors so they're in the correct order (without reordering the responses are ordered alphabetically)
+
+data$Q3 <-  factor(data$Q3,levels(data$Q3)[c(2,4,5,3,1)], ordered = TRUE)
+
+data$Q6 <-  factor(data$Q6,levels(data$Q6)[c(2,1)], ordered = TRUE)
+
+data$Q7 <-  factor(data$Q7,levels(data$Q7)[c(2,1,3)], ordered = TRUE)
+
+agree_questions <- data[,8:14]
+agree_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,2,3,1,4)], ordered = TRUE))(agree_questions)
+data[,8:14] <- agree_questions
+
+average_questions <- data[,15:19]
+average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,3,2,1,4)], ordered = TRUE))(average_questions)
+data[,15:19] <- average_questions
+
+data$Q20 <- factor(data$Q20,levels(data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
+
+data$Q22 <- factor(data$Q22,levels(data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
+
+data$Q23 <- factor(data$Q23,levels(data$Q23)[c(2,4,3,1)], ordered = TRUE)
+
+data$Q24 <- factor(data$Q24,levels(data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
+
+data$Q25 <- factor(data$Q25,levels(data$Q25)[c(1,3,2)], ordered = TRUE)
+
+data$Q26 <- factor(data$Q26,levels(data$Q26)[c(1,3,2)], ordered = TRUE)
+
+```
+
 ```{r to_three_groups}
 to_three_averages <- function(fctr){
-  levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
+  levels(fctr) <- c("Below average", "Below average", "Average", "Above average", "Above average")
   return(fctr)
 }
 
 to_three_agrees <- function(fctr){
-  levels(fctr) <- c("Agree", "Disagree", "Neutral", "Agree", "Disagree")
+  levels(fctr) <- c("Disagree", "Disagree", "Neutral", "Agree", "Agree")
   return(fctr)
 }
 ```
-
-```{r order_factors, echo=FALSE}
-mw_data <- data
-
-mw_data$Q6 <-  factor(mw_data$Q6,levels(mw_data$Q6)[c(2,1)], ordered = TRUE)
-
-mw_data$Q7 <-  factor(mw_data$Q7,levels(mw_data$Q7)[c(2,1,3)], ordered = TRUE)
-
-agree_questions <- mw_data[,8:14]
-agree_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,2,3,1,4)], ordered = TRUE))(agree_questions)
-mw_data[,8:14] <- agree_questions
-
-average_questions <- mw_data[,15:19]
-average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,3,2,1,4)], ordered = TRUE))(average_questions)
-mw_data[,15:19] <- average_questions
-
-mw_data$Q20 <- factor(mw_data$Q20,levels(mw_data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
-
-mw_data$Q22 <- factor(mw_data$Q22,levels(mw_data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
-
-mw_data$Q23 <- factor(mw_data$Q23,levels(mw_data$Q23)[c(2,4,3,1)], ordered = TRUE)
-
-mw_data$Q24 <- factor(mw_data$Q24,levels(mw_data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
-
-get_man_whitney <- function(ind_col, dep_col, df) {
-  mw_stat <- wilcox.test(as.integer(dep_col) ~ as.integer(ind_col), data = df)
-  return(mw_stat)
-} 
-
-mw_results <- catcolwise(function(my_col)  get_man_whitney(mw_data$Q1,my_col,mw_data)[3])(mw_data[,3:24])
-
-colnames(mw_results) <- as.character(questions[3:24,1])
-t(unnest(mw_results))
-```
-
-
 
 ## Contingency tables and test of association
 
@@ -255,23 +250,42 @@ gender_vs_social_group_perception
 ```
 
 ```{r crosstab_socialgroup_3groups}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q16))
 gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 ```
 
-```{r mann_whitney_q25}
-mw_data <- data
-
-
-levels(mw_data$Q20)
-
-mw_data$Q20 <- factor(mw_data$Q20,levels(mw_data$Q20)[c(5,3,1,2,4)],ordered = TRUE)
-levels(mw_data$Q20)
-
-wilcox.test(as.integer(Q20) ~ as.integer(Q1), mw_data)
-
+```{r mann_whitney}
+get_mann_whitney <- function(ind_col, dep_col, df) {
+  mw_stat <- wilcox.test(as.numeric(dep_col) ~ as.numeric(ind_col), data = df)
+  return(mw_stat)
+} 
 ```
+
+Question 7: Are you interested in graduate school (in any discipline)?  
+Possible answers: "No", "Maybe", or "Yes" 
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+$H_0:$ the two samples are from the same distribution, i.e. there is significant difference between responses from male students and non-male students  
+$H_a:$ the two samples are from two different distributions, i.e. there is a significant difference between responses from male students and non-male students  
+The type-two error is $\alpha = .05$  
+```{r q7_mann_whitney}
+q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, mw_data)
+q7_mw_results
+```
+With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.   
+
+
+Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?  
+Possible answers: "Often", "Sometimes", "Rarely", or "Never"  
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+$H_0:$ the two samples are from the same distribution, i.e. there is significant difference between responses from male students and non-male students  
+$H_a:$ the two samples are from two different distributions, i.e. there is a significant difference between responses from male students and non-male students  
+The type-two error is $\alpha = .05$  
+```{r q23_mann_whitney}
+q23_mw_results <- get_mann_whitney(data$Q1, data$Q23, mw_data)
+q23_mw_results
+```
+With a p-value of $2.465 \times 10^{-6}$ we reject the null hypothesis and conclude that there is a statistically significant difference between the responses of male students and non-male students when asked about the frequency of concerns that their performance in math will confirm a negative stereotype about them.  
 
 
 # Appendix
@@ -296,31 +310,9 @@ colnames(overall_race_ethnicity) <- "Race/Ethnicity"
 plot_data <- cbind(plot_data,overall_race_ethnicity)
 plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(5,4,1:3,6)])
 
-plot_data$Q6 <-  factor(plot_data$Q6,levels(plot_data$Q6)[c(2,1)])
+plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
 
-plot_data$Q7 <-  factor(plot_data$Q7,levels(plot_data$Q7)[c(3,1,2)])
-
-agree_questions <- plot_data[,8:14]
-agree_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,2,3,1,4)]))(agree_questions)
-plot_data[,8:14] <- agree_questions
-
-average_questions <- plot_data[,15:19]
-average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,3,2,1,4)]))(average_questions)
-plot_data[,15:19] <- average_questions
-
-plot_data$Q20 <- factor(plot_data$Q20,levels(plot_data$Q20)[c(5,3,1,2,4)])
-
-plot_data$Q22 <- factor(plot_data$Q22,levels(plot_data$Q22)[c(5,2,3,1,4)])
-
-plot_data$Q23 <- factor(plot_data$Q23,levels(plot_data$Q23)[c(2,4,3,1)])
-
-plot_data$Q24 <- factor(plot_data$Q24,levels(plot_data$Q24)[c(5,3,1,2,4)])
-
-plot_data$Q3 <-  factor(plot_data$Q3,levels(plot_data$Q3)[c(2,4,5,3,1)])
-
-plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, at NCF & elsewhere","Yes, but not at NCF"))
-
-plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, at NCF & elsewhere","Yes, but not at NCF"))
+plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
 
 plot_by_gender <- function(question_col,question_title) {
   gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
@@ -359,11 +351,16 @@ plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
 plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE)
 ```
 
-<!-- ## Question 4: What is your Area of Concentration? -->
-<!-- To be included: plot describing distribution of AOC's  -->
+## Question 4: What is your Area of Concentration?
+```{r plot_q4, echo=FALSE, fig.keep='all'}
+q4_data <- mapvalues(plot_data$is_stem_aoc, from = c(TRUE,FALSE), to = c("STEM","Not STEM"))
+q4_title <- "AOC"
+plot_by_gender(q4_data,q4_title)
+plot_by_ethnicity(q4_data,q4_title)
+```
 
 <!-- ## Question 5: Which math classes have you taken at New College? -->
-<!-- To be included: plot describing distribution of math classes taken by the respondents -->
+<!-- To be included: plot describing distribution of math classes taken by the respondents, column has multiple values and need to be normalized-->
 
 ### Question 6: Are you considering, or did you ever consider a concentration in Math?
 ```{r plot_q6, echo=FALSE, fig.keep='all'}
