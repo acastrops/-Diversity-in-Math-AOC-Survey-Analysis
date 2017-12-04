@@ -5,8 +5,6 @@ author: "Adriana Souza, Lydia LaSeur, Roger Filmyer"
 date: "November 12th, 2017"
 bibliography: citations.bibtex
 output:
-  html_document:
-    toc: yes
   html_notebook:
     highlight: tango
     mathjax: null
@@ -537,7 +535,7 @@ q25_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyou
 plot_by_gender(q25_data,q25_title) 
 ```
 
-### Question 26: Have you ever felt that you were perceived or treated differently in a math class due to yourrace or ethnicity?
+### Question 26: Have you ever felt that you were perceived or treated differently in a math class due to your race or ethnicity?
 ```{r plot_q26, echo=FALSE, fig.keep='all'}
 q26_data <- plot_data$Q26
 q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
