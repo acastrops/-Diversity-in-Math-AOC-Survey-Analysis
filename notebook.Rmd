@@ -1,9 +1,12 @@
 ---
-title: "Does the gender and ethnicity of New College students influence their experience with math classes?"
-author: "Adriana Souza, Lydia Laseur, Roger Filmyer"
+title: Does the gender and ethnicity of New College students influence their experience
+  with math classes?
+author: "Adriana Souza, Lydia LaSeur, Roger Filmyer"
 date: "November 12th, 2017"
 bibliography: citations.bibtex
 output:
+  html_document:
+    toc: yes
   html_notebook:
     highlight: tango
     mathjax: null
@@ -19,6 +22,7 @@ library(survey)
 library(srvyr)
 library(psych)
 library(shiny)
+library(plyr)
 library(dplyr)
 library(ggplot2)
 library(tibble)
@@ -26,6 +30,7 @@ library(reshape2)
 library(tidyr)
 library(stringi)
 library(likert)
+
 ```
 
 
@@ -194,14 +199,46 @@ data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, colla
 
 
 
+```{r order_factors, echo=FALSE}
+## since most responses are on an ordinal scale, this reorders the factors so they're in the correct order (without reordering the responses are ordered alphabetically)
+
+data$Q3 <-  factor(data$Q3,levels(data$Q3)[c(2,4,5,3,1)], ordered = TRUE)
+
+data$Q6 <-  factor(data$Q6,levels(data$Q6)[c(2,1)], ordered = TRUE)
+
+data$Q7 <-  factor(data$Q7,levels(data$Q7)[c(2,1,3)], ordered = TRUE)
+
+agree_questions <- data[,8:14]
+agree_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,2,3,1,4)], ordered = TRUE))(agree_questions)
+data[,8:14] <- agree_questions
+
+average_questions <- data[,15:19]
+average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c(5,3,2,1,4)], ordered = TRUE))(average_questions)
+data[,15:19] <- average_questions
+
+data$Q20 <- factor(data$Q20,levels(data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
+
+data$Q22 <- factor(data$Q22,levels(data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
+
+data$Q23 <- factor(data$Q23,levels(data$Q23)[c(2,4,3,1)], ordered = TRUE)
+
+data$Q24 <- factor(data$Q24,levels(data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
+
+data$Q25 <- factor(data$Q25,levels(data$Q25)[c(1,3,2)], ordered = TRUE)
+
+data$Q26 <- factor(data$Q26,levels(data$Q26)[c(1,3,2)], ordered = TRUE)
+
+```
+
+
 ```{r to_three_groups}
 to_three_averages <- function(fctr){
-  levels(fctr) <- c("Above average", "Average", "Below average", "Above average", "Below average")
+  levels(fctr) <- c("Below average", "Below average", "Average", "Above average", "Above average")
   return(fctr)
 }
 
 to_three_agrees <- function(fctr){
-  levels(fctr) <- c("Agree", "Disagree", "Neutral", "Agree", "Disagree")
+  levels(fctr) <- c("Disagree", "Disagree", "Neutral", "Agree", "Agree")
   return(fctr)
 }
 ```
@@ -220,109 +257,289 @@ gender_vs_social_group_perception
 When performing a chi-squared test of independence, we do not find a significant result. We cannot conclude that a student's gender leads to a different response on this survey question.
 
 ```{r crosstab_socialgroup_3groups}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q16))
 gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 #mantelhaen.test(gender_vs_social_group_perception)
 ```
 
-## Goodness of Fit 
+## Mann-Whitney U test
+```{r mann_whitney}
+get_mann_whitney <- function(ind_col, dep_col, df) {
+  mw_stat <- wilcox.test(as.numeric(dep_col) ~ as.numeric(ind_col), data = df)
+  return(mw_stat)
+} 
+```
 
-For the comparison of two groups on an ordinal response, 
+Question 7: Are you interested in graduate school (in any discipline)?  
+Possible answers: "No", "Maybe", or "Yes" 
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+$H_0:$ the two samples are from the same distribution, i.e. there is significant difference between responses from male students and non-male students  
+$H_a:$ the two samples are from two different distributions, i.e. there is a significant difference between responses from male students and non-male students  
+The type-two error is $\alpha = .05$  
+
+```{r q7_mann_whitney}
+q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, mw_data)
+q7_mw_results
+```
+
+With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.   
 
 
-Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
+Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?  
+Possible answers: "Often", "Sometimes", "Rarely", or "Never"  
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+$H_0:$ the two samples are from the same distribution, i.e. there is significant difference between responses from male students and non-male students  
+$H_a:$ the two samples are from two different distributions, i.e. there is a significant difference between responses from male students and non-male students  
+The type-two error is $\alpha = .05$  
 
-## Logistic Regression
+```{r q23_mann_whitney}
+q23_mw_results <- get_mann_whitney(data$Q1, data$Q23, mw_data)
+q23_mw_results
+```
 
-# Results
+With a p-value of $2.465 \times 10^{-6}$ we reject the null hypothesis and conclude that there is a statistically significant difference between the responses of male students and non-male students when asked about the frequency of concerns that their performance in math will confirm a negative stereotype about them.  
 
 
 
 # Appendix
 
 ## Appendix: Question breakdown
+```{r plot_prep, echo=FALSE, results='hide'}
+plot_data <- data
 
+assign_ethnicity <- function(record) {
+  if (sum(record) > 1) return("Muliethnic")
+  if (sum(record) == 0) return("Unable to Determine")
+  if (record[1] == TRUE) return("Asian")
+  if (record[2] == TRUE) return("Black or African American")
+  if (record[3] == TRUE) return("Hispanic or Latino")
+  if (record[4] == TRUE) return("Native Hawaiian or Other Pacific Islander")
+  if (record[5] == TRUE) return("White")
+}
+race_ethnicity_data <- data[,ethnicity_groups]
 
-## Question breakdown
+overall_race_ethnicity <- data.frame(apply(race_ethnicity_data, MARGIN = 1, FUN = assign_ethnicity))
+colnames(overall_race_ethnicity) <- "Race/Ethnicity"
+plot_data <- cbind(plot_data,overall_race_ethnicity)
+plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(5,4,1:3,6)])
+
+plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
+
+plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
+
+plot_by_gender <- function(question_col,question_title) {
+  gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
+  gender_plot <- gender_plot + geom_bar(position="fill") + coord_flip()
+  gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title))
+  return(gender_plot)
+}
+
+plot_by_ethnicity <- function(question_col,question_title) {
+  ethnicity_plot <- ggplot(plot_data, aes(x = `Race/Ethnicity`, fill = factor(question_col))) 
+  ethnicity_plot <- ethnicity_plot + geom_bar(position="fill") + coord_flip()
+  ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title))
+  return(ethnicity_plot)
+}
+```
+
 ### Question 1: What gender do you identify as?
-```{r}
+```{r plot_q1, echo=FALSE, fig.keep='all'}
 other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
 gender <- as.character(raw_data$Q1)
 gender[other] <- "Other"
 gender <- data.frame((as.factor(gender)))
-colnames(gender) <- "options"
-ggplot(gender,aes(options)) + geom_bar()
+colnames(gender) <- "Gender"
+ggplot(gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE)
 ```
 
-## Question 2: What is your race/ethnicity?
-```{r}
-library(cluster)
-library(reshape2)
-race_ethnicity <- sapply(data[,ethnicity_groups],as.integer)
-
-multiethnic <- rowSums(race_ethnicity) > 1
-
-race_ethnicity <- race_ethnicity[!multiethnic,]
-
-race_ethnicity_counts <- data.frame(colSums(race_ethnicity))
-colnames(race_ethnicity_counts) <- "Frequency" 
-race_ethnicity_counts <- rbind(race_ethnicity_counts, sum(multiethnic))
-rownames(race_ethnicity_counts)[6] <- "Multiethnic"
+### Question 2: What is your race/ethnicity?
+```{r plot_q2, echo=FALSE, fig.keep='all'}
+plot_q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
+plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE)
 ```
 
-## Question 3: What is your year at New College?
-```{r}
-year <- ggplot(data, aes(Q3))
-year + geom_bar()
+### Question 3: What is your year at New College?
+```{r plot_q3, echo=FALSE, fig.keep='all'}
+plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
+plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE)
 ```
 
 ## Question 4: What is your Area of Concentration?
-
-## Question 5: Which math classes have you taken at New College?
-
-## Question 6: Are you considering, or did you ever consider a concentration in Math?
-```{r}
-q6 <- ggplot(data, aes(Q1,fill = factor(Q6))) 
-q6 + geom_bar(position="fill") + coord_flip()
-
+```{r plot_q4, echo=FALSE, fig.keep='all'}
+q4_data <- mapvalues(plot_data$is_stem_aoc, from = c(TRUE,FALSE), to = c("STEM","Not STEM"))
+q4_title <- "AOC"
+plot_by_gender(q4_data,q4_title)
+plot_by_ethnicity(q4_data,q4_title)
 ```
 
-## Question 7: Are you interested in graduate school, in any discipline?
-```{r}
-q7 <- ggplot(data, aes(Q1,fill = factor(Q7))) 
-q7 + geom_bar(position="fill") + coord_flip()
+<!-- ## Question 5: Which math classes have you taken at New College? -->
+<!-- To be included: plot describing distribution of math classes taken by the respondents, column has multiple values and need to be normalized-->
+
+### Question 6: Are you considering, or did you ever consider a concentration in Math?
+```{r plot_q6, echo=FALSE, fig.keep='all'}
+q6_data <- plot_data$Q6
+q6_title <- "Ever consider AOC\nin Math?"
+plot_by_gender(q6_data,q6_title)
+plot_by_ethnicity(q6_data,q6_title)
+```
+
+### Question 7: Are you interested in graduate school, in any discipline?
+```{r plot_q7, echo=FALSE, fig.keep='all'}
+q7_data <- plot_data$Q7
+q7_title <- "Interested in\ngrad school?"
+plot_by_gender(q7_data,q7_title)
+plot_by_ethnicity(q7_data,q7_title)
 ```
 
 ### Question 8: "I find mathematics interesting."
-```{r}
-l <- likert(data.frame(data$Q8),grouping=data$Q1)
-likert.bar.plot(l)
-
-
-levels(data$Q8)
-data$Q8 <-  factor(data$Q8,levels(data$Q8)[c(5,2,3,1,4)])
-
-q8 <- ggplot(data, aes(Q1,fill = factor(Q8))) 
-q8 + geom_bar(position="fill") + coord_flip()
+```{r plot_q8, echo=FALSE, fig.keep='all'}
+# l <- likert(data.frame(data$Q8),grouping=data$Q1)
+# likert.bar.plot(l)
+q8_data <- plot_data$Q8
+q8_title <- "I find math\ninteresting."
+plot_by_gender(q8_data,q8_title)
+plot_by_ethnicity(q8_data,q8_title)
 ```
+
 ### Question 9: "Mathematics leads to many possible career opportunities."
-```{r}
-levels(data$Q9)
-data$Q9 <-  factor(data$Q9,levels(data$Q9)[c(2,3,1,4)])
-
-
-q9 <- ggplot(data, aes(Q1,fill = factor(Q9))) 
-q9 + geom_bar(position="fill") + coord_flip()
+```{r plot_q9, echo=FALSE, fig.keep='all'}
+q9_data <- plot_data$Q9
+q9_title <- "Math leads to many\ncareer opportunities."
+plot_by_gender(q9_data,q9_title)
+plot_by_ethnicity(q9_data,q9_title)
 ```
 
 ### Question 10: "With practice it is easy for me to improve my skills in math."
-```{r}
-levels(data$Q10)
-data$Q10 <-  factor(data$Q10,levels(data$Q10)[c(5,2,3,1,4)])
-
-
-q10 <- ggplot(data, aes(Q1,fill = factor(Q10))) 
-q10 + geom_bar(position="fill") + coord_flip()
+```{r plot_q10, echo=FALSE, fig.keep='all'}
+q10_data <- plot_data$Q10
+q10_title <- "It is easy to improve\nmy math skills with\npractice"
+plot_by_gender(q10_data,q10_title)
+plot_by_ethnicity(q10_data,q10_title)
 ```
 
+### Question 11: "Men are generally better suited to mathematics than women."
+```{r plot_q11, echo=FALSE, fig.keep='all'}
+q11_data <- plot_data$Q11
+q11_title <- "Men are generally\nbetter at math."
+plot_by_gender(q11_data,q11_title)
+plot_by_ethnicity(q11_data,q11_title)
+```
+
+### Question 12: "Many people believe that men are better suited to mathematics than women."
+```{r plot_q12, echo=FALSE, fig.keep='all'}
+q12_data <- plot_data$Q12
+q12_title <- "Many believe that\nmen are generally\nbetter at math."
+plot_by_gender(q12_data,q12_title)
+plot_by_ethnicity(q12_data,q12_title)
+```
+
+### Question 13: "Some racial ethnic groups are generally better suited to mathematics than others."
+```{r plot_q13, echo=FALSE, fig.keep='all'}
+q13_data <- plot_data$Q13
+q13_title <- "Some racial ethnic\ngroups are generally\nbetter at math."
+plot_by_gender(q13_data,q13_title)
+plot_by_ethnicity(q13_data,q13_title)
+```
+
+### Question 14: "Many people believe that some racial ethnic groups are better suited to mathematics than others."
+```{r plot_q14, echo=FALSE, fig.keep='all'}
+q14_data <- plot_data$Q14
+q14_title <- "Many believe that\nsome racial ethnic\ngroups are generally\nbetter at math."
+plot_by_gender(q14_data,q14_title)
+plot_by_ethnicity(q14_data,q14_title)
+```
+
+### Question 15: Rate your mathematical ability compared to your high school student population.
+```{r plot_q15, echo=FALSE, fig.keep='all'}
+q15_data <- plot_data$Q15
+q15_title <- "Rate your math skills\ncompared to your high\nschool population."
+plot_by_gender(q15_data,q15_title)
+plot_by_ethnicity(q15_data,q15_title)
+```
+
+### Question 16: Rate your mathematical ability compared to the student population at New College.
+```{r plot_q16, echo=FALSE, fig.keep='all'}
+q16_data <- plot_data$Q16
+q16_title <- "Rate your math skills\ncompared to New\nCollege population."
+plot_by_gender(q16_data,q16_title)
+plot_by_ethnicity(q16_data,q16_title)
+```
+
+### Question 17: Rate your mathematical ability compared to your social group.
+```{r plot_q17, echo=FALSE, fig.keep='all'}
+q17_data <- plot_data$Q17
+q17_title <- "Rate your math skills\ncompared to your\nsocial group."
+plot_by_gender(q17_data,q17_title)
+plot_by_ethnicity(q17_data,q17_title)
+```
+
+### Question 18: Rate your mathematical ability compared to other students of your gender.
+```{r plot_q18, echo=FALSE, fig.keep='all'}
+q18_data <- plot_data$Q18
+q18_title <- "Rate your math skills\ncompared to students\nof your gender."
+plot_by_gender(q18_data,q18_title)
+plot_by_ethnicity(q18_data,q18_title)
+```
+
+### Question 19: Rate your mathematical ability compared to other students of your racial ethnic group.
+```{r plot_q19, echo=FALSE, fig.keep='all'}
+q19_data <- plot_data$Q19
+q19_title <- "Rate your math skills\ncompared to students\nof your racial ethnic\ngroup."
+plot_by_gender(q19_data,q19_title)
+plot_by_ethnicity(q19_data,q19_title)
+```
+
+### Question 20: Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
+```{r plot_q20, echo=FALSE, fig.keep='all'}
+q20_data <- plot_data$Q20
+q20_title <- "Likelihood of dropping\na difficult math class."
+plot_by_gender(q20_data,q20_title)
+plot_by_ethnicity(q20_data,q20_title)
+```
+
+### Question 21: Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
+```{r plot_q21, echo=FALSE, fig.keep='all'}
+q21_data <- plot_data$Q21
+q21_title <- "Ever dropped a\ndifficult math class?"
+plot_by_gender(q21_data,q21_title)
+plot_by_ethnicity(q21_data,q21_title)
+```
+
+### Question 22: Compared to other subjects, do you feel more or less anxiety in mathematics classes?
+```{r plot_q22, echo=FALSE, fig.keep='all'}
+q22_data <- plot_data$Q22
+q22_title <- "More or less anxiety\nin math classes?"
+plot_by_gender(q22_data,q22_title)
+plot_by_ethnicity(q22_data,q22_title)
+```
+
+### Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?
+```{r plot_q23, echo=FALSE, fig.keep='all'}
+q23_data <- plot_data$Q23
+q23_title <- "Frequency of concerns\nthat your math abilities\nwill confirm negative\nstereotypes?"
+plot_by_gender(q23_data,q23_title)
+plot_by_ethnicity(q23_data,q23_title)
+```
+
+### Question 24: Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
+```{r plot_q24, echo=FALSE, fig.keep='all'}
+q24_data <- plot_data$Q24
+q24_title <- "Feel comfortable\nor out of place in\nNCF math class?"
+plot_by_gender(q24_data,q24_title)
+plot_by_ethnicity(q24_data,q24_title)
+```
+
+### Question 25: Have you ever felt that you were perceived or treated differently in a math class due to your gender?
+```{r plot_q25, echo=FALSE, fig.keep='all'}
+q25_data <- plot_data$Q25
+q25_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour gender?"
+plot_by_gender(q25_data,q25_title) 
+```
+
+### Question 26: Have you ever felt that you were perceived or treated differently in a math class due to yourrace or ethnicity?
+```{r plot_q26, echo=FALSE, fig.keep='all'}
+q26_data <- plot_data$Q26
+q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
+plot_by_ethnicity(q26_data,q26_title) 
+```
