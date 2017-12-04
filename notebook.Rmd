@@ -2,6 +2,7 @@
 title: "Does the gender and ethnicity of New College students influence their experience with math classes?"
 author: "Adriana Souza, Lydia Laseur, Roger Filmyer"
 date: "November 12th, 2017"
+bibliography: citations.bibtex
 output:
   html_notebook:
     highlight: tango
@@ -58,6 +59,17 @@ Likert-type responses were chosen due to being a popular psychometric item scori
 The problem with Likert-type scales and ordinal responses is how to choose the appropriate statistical treatment of the data. If the data is ordinal, then non-parametric statistics are typically considered the most appropriate option for analysis. If the data is interval, then parametric statistics can be used. 
 
 To avoid possible misinterpretation, we took care in analyzing how each variable and question were coded. Additionally, each question has corresponding visualizations that illustrate the relationships more clearly. 
+
+### Gender
+
+One of the biggest questions we had with our survey data was the question of gender identity. Traditionally, studies looking at gender differences versus educational attainment have assumed a strict male/female gender binary.
+Even more recent studies have taken into account nonbinary gender as a survey question, but did not include the relatively small number of respondents identifying as nonbinary in their analysis. [@clancy]
+We found neither of these approaches satisfactory. We, along with Dr. Kottke, felt it irresponsible to assume a gender binary in our survey questioning. And while the analytical shortcut of ignoring nonbinary participants might have surved Clancy et. al.'s purposes, given their low number and proportion of nonbinary respondents (n, x%),  we found a much larger proportion of our survey sample identifying as nonbinary (n, x%), a group that we can not ignore for statistical reasons as well as moral reasons.
+
+This forced us to question what exactly we wanted to measure as a predictor variable: Gender identity, gender conformity, masculinity, or femininity.
+We ended up focusing on the role of masculinity, given that articles with queer-focused and intersectional prespectives specifically talk about the "masculine nature of both math and sciences"[@yodermattheis 22], or the "male superiority myth"[@leyva 399]. Our issue appears to be one of masculinity specifically.
+
+WIth this in mind, instead of looking at gender identity, we looked at masculinity as a predictor. We transformed our responses to the gender identity question into a binary variable of whether the respondent self-identified as male, or not. Only responses where a survey participant checked the box indicating "Male" were coded as "yes" for the variable; all "Female" box checks or "Other" answers (including if the subject indicated they were a trans man, but did not check the "Male" box), were coded as "no". This is an approach we had not found addressed in literature, but with substantially higher nonbinary participation on a survey that was not specifically targeted at nonbinary or transgender individuals, we found ourselves facing relatively novel circumstances.
 
 ### Issues
 
