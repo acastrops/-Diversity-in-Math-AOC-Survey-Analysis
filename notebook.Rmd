@@ -277,7 +277,7 @@ $H_a:$ the two samples are from two different distributions, i.e. there is a sig
 The type-two error is $\alpha = .05$  
 
 ```{r q7_mann_whitney}
-q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, mw_data)
+q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, data)
 q7_mw_results
 ```
 
@@ -292,7 +292,7 @@ $H_a:$ the two samples are from two different distributions, i.e. there is a sig
 The type-two error is $\alpha = .05$  
 
 ```{r q23_mann_whitney}
-q23_mw_results <- get_mann_whitney(data$Q1, data$Q23, mw_data)
+q23_mw_results <- get_mann_whitney(data$Q1, data$Q23, data)
 q23_mw_results
 ```
 
