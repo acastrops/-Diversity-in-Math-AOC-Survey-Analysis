@@ -262,13 +262,13 @@ For our regression model to be realistic, we must account for the order of the l
 
 
 ```{r ordinal_logistic_regression}
-anxiety_level <- data$Q22
-gender <- data$Q1
-OLR_model <- polr(anxiety_level ~ )
+#anxiety_level <- data$Q22
+#gender <- data$Q1
+#OLR_model <- polr(anxiety_level ~ )
 ```
 
 
-In the case of question 17 ("How would you rate your mathematical ability, compared to your social group?"), we first needed to consolidate the five response groups into three (The chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average, the actual EV is `r sum(gender_vs_social_group_perception["Male",])*sum(gender_vs_social_group_perception[, "Well below average"])/sum(gender_vs_social_group_perception)`).
+In the case of question 17 ("How would you rate your mathematical ability, compared to your social group?"), we first needed to consolidate the five response groups into three (The chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average, the actual EV is 
 
 ```{r crosstab_socialgroup_example, eval=FALSE}
 gender_vs_social_group_perception <- table(data$Q1, data$Q17)
