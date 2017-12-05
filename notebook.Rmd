@@ -151,6 +151,14 @@ non_male <- gender_col != "Male"
 gender_col[non_male] <-  "Not Male"
 gender_col <- as.factor(gender_col)
 data$Q1 <- gender_col
+length(data$Q1)
+
+## Add column named gender that maps Male to 1 and Not Male to 0 to be used in the logistic regression
+map_gender <- function(rec) {
+  if (rec == "Male") return(1) else return(0) 
+}
+gender <- sapply(X = data$Q1, FUN = map_gender)
+data <- cbind(data,gender)
 ```
 
 
@@ -241,6 +249,7 @@ to_three_agrees <- function(fctr){
 }
 ```
 
+
 ## Contingency tables and test of association
 
 To evaluate whether there is a connection between masculinity and confidence in mathematical ability among the New College student body, we produced crosstabs of question responses by respondents' masculine identity, and then conducted chi-squared tests of independence to evaluate whether there was an association.
@@ -255,7 +264,7 @@ gender_vs_social_group_perception
 When performing a chi-squared test of independence, we do not find a significant result. We cannot conclude that a student's gender leads to a different response on this survey question.
 
 ```{r crosstab_socialgroup_3groups}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q16))
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
 gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 #mantelhaen.test(gender_vs_social_group_perception)
