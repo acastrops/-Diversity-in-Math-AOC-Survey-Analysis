@@ -29,6 +29,10 @@ library(tidyr)
 library(stringi)
 library(likert)
 
+## Libraries for OLR (Ordinal Logistic Regression)
+library(foreign)
+library(MASS)
+library(Hmisc)
 ```
 
 
@@ -252,9 +256,8 @@ to_three_agrees <- function(fctr){
 
 ## Contingency tables and test of association
 
-To evaluate whether there is a connection between masculinity and confidence in mathematical ability among the New College student body, we produced crosstabs of question responses by respondents' masculine identity, and then conducted chi-squared tests of independence to evaluate whether there was an association.
 
-In the case of question 17 ("How would you rate your mathematical ability, compared to your social group?"), we first needed to consolidate the five response groups into three (The chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average, the actual EV is `r sum(gender_vs_social_group_perception["Male",])*sum(gender_vs_social_group_perception[, "Well below average"])/sum(gender_vs_social_group_perception)`).
+In the case of question 17 ("How would you rate your mathematical ability, compared to your social group?"), we first needed to consolidate the five response groups into three (The chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average, the actual EV is 
 
 ```{r crosstab_socialgroup_example, eval=FALSE}
 gender_vs_social_group_perception <- table(data$Q1, data$Q17)
@@ -269,6 +272,66 @@ gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 #mantelhaen.test(gender_vs_social_group_perception)
 ```
+
+
+## Goodness of Fit 
+
+For the comparison of two groups on an ordinal response, 
+
+
+Instead of testing independence or conditional independece we can also test the fit of a model that would compare 
+
+## Logistic Regression
+
+Ordinal Regression is an extension of binomial logistics regression. Ordinal regression is used to predict the dependent variable with 'ordered' multiple categories and independent variables. In other words, it is used to facilitate the interaction of dependent variables (having multiple ordered levels) with one or more independent variables.
+
+For our regression model to be realistic, we must account for the order of the likert items in our response variable. 
+
+```{r general_predictors}
+is_non_hispanic_white <- as.numeric(data$`Non-Hispanic White`)
+is_minority <- !is_non_hispanic_white
+is_asian <- data$Asian
+year <- as.numeric(data$Q3) #Survey responses were ordered in cleaning
+is_stem <- data$is_stem_aoc
+#gender <- as.
+```
+
+
+
+```{r olr_anxiety}
+anxiety_level <- data$Q22
+anxiety_model <- polr(anxiety_level ~  + is_minority + year + is_stem, data = data, Hess = TRUE)
+Summary(anxiety_model)
+```
+
+```{r olr_confidence_level}
+# Plan is to to the same for following response variables:
+confidence_level <- data$Q16
+```
+
+```{r olr_gender_discrimination}
+gender_discrimination_felt <- data$Q25
+
+```
+
+```{r olr_stereotype}
+stereotype_threat_felt <- data$Q23
+
+```
+
+```{r olr_racial_discrimination}
+racial_discrimination_felt <- data$Q26
+
+```
+
+```{r olr_belonging}
+sense_of_belonging <- data$Q24
+
+```
+
+
+
+
 
 ## Mann-Whitney U test
 ```{r mann_whitney}
