@@ -386,6 +386,8 @@ q7_mw_results
 With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.   
 
 
+
+
 Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?  
 Possible answers: "Often", "Sometimes", "Rarely", or "Never"  
 All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
@@ -494,8 +496,6 @@ plot_by_ethnicity(q7_data,q7_title)
 
 ### Question 8: "I find mathematics interesting."
 ```{r plot_q8, echo=FALSE, fig.keep='all'}
-# l <- likert(data.frame(data$Q8),grouping=data$Q1)
-# likert.bar.plot(l)
 q8_data <- plot_data$Q8
 q8_title <- "I find math\ninteresting."
 plot_by_gender(q8_data,q8_title)
