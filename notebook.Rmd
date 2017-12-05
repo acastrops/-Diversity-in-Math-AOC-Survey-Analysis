@@ -213,9 +213,7 @@ data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, colla
 ## since most responses are on an ordinal scale, this reorders the factors so they're in the correct order (without reordering the responses are ordered alphabetically)
 
 data$Q3 <-  factor(data$Q3,levels(data$Q3)[c(2,4,5,3,1)], ordered = TRUE)
-
 data$Q6 <-  factor(data$Q6,levels(data$Q6)[c(2,1)], ordered = TRUE)
-
 data$Q7 <-  factor(data$Q7,levels(data$Q7)[c(2,1,3)], ordered = TRUE)
 
 agree_questions <- data[,8:14]
@@ -227,15 +225,10 @@ average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c
 data[,15:19] <- average_questions
 
 data$Q20 <- factor(data$Q20,levels(data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
-
 data$Q22 <- factor(data$Q22,levels(data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
-
 data$Q23 <- factor(data$Q23,levels(data$Q23)[c(2,4,3,1)], ordered = TRUE)
-
 data$Q24 <- factor(data$Q24,levels(data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
-
 data$Q25 <- factor(data$Q25,levels(data$Q25)[c(1,3,2)], ordered = TRUE)
-
 data$Q26 <- factor(data$Q26,levels(data$Q26)[c(1,3,2)], ordered = TRUE)
 
 ```
@@ -287,6 +280,7 @@ Ordinal Regression is an extension of binomial logistics regression. Ordinal reg
 
 For our regression model to be realistic, we must account for the order of the likert items in our response variable. 
 
+
 ```{r general_predictors}
 is_non_hispanic_white <- as.numeric(data$`Non-Hispanic White`)
 is_minority <- as.numeric(!is_non_hispanic_white)
@@ -299,8 +293,6 @@ gender <- data$gender
 
 
 ```{r olr_anxiety}
-# https://www.analyticsvidhya.com/blog/2016/02/multinomial-ordinal-logistic-regression/
-
 anxiety_level <- data$Q22
 anxiety_model <- polr(anxiety_level ~ gender + is_minority + year + is_stem, data = data, Hess = TRUE)
 #summary(anxiety_model)
@@ -332,35 +324,48 @@ pr <- profile(anxiety_model_3)
 confint(pr)
 plot(pr)
 pairs(pr)
+
+#Creating function for the steps above
+get_olr <- function(response, df){
+  model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
+  summary(model)
+  summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
+  model2 <- stepAIC(model, ~.^2)
+  anova(model, model2)
+  #model3 <- update(model, Hess=TRUE)
+  #pr <- profile(model3)
+  #confint(pr)
+  #plot(pr)
+  #pairs(pr)
+  return (model2)
+}
 ```
 
 ```{r olr_confidence_level}
 # Plan is to to the same for following response variables:
 confidence_level <- data$Q16
+get_olr(confidence_level, data)
 ```
 
 ```{r olr_gender_discrimination}
 gender_discrimination_felt <- data$Q25
-
+get_olr(gender_discrimination_felt, data)
 ```
 
 ```{r olr_stereotype}
 stereotype_threat_felt <- data$Q23
-
+get_olr(stereotype_threat_felt, data)
 ```
 
 ```{r olr_racial_discrimination}
 racial_discrimination_felt <- data$Q26
-
+get_olr(racial_discrimination_felt, data)
 ```
 
 ```{r olr_belonging}
 sense_of_belonging <- data$Q24
-
+get_olr(sense_of_belonging, data)
 ```
-
-
-
 
 
 ## Mann-Whitney U test
