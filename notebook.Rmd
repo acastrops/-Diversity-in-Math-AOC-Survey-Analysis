@@ -213,9 +213,7 @@ data$is_stem_aoc <- stri_detect_regex(data$Q4, paste(stem_search_criteria, colla
 ## since most responses are on an ordinal scale, this reorders the factors so they're in the correct order (without reordering the responses are ordered alphabetically)
 
 data$Q3 <-  factor(data$Q3,levels(data$Q3)[c(2,4,5,3,1)], ordered = TRUE)
-
 data$Q6 <-  factor(data$Q6,levels(data$Q6)[c(2,1)], ordered = TRUE)
-
 data$Q7 <-  factor(data$Q7,levels(data$Q7)[c(2,1,3)], ordered = TRUE)
 
 agree_questions <- data[,8:14]
@@ -227,15 +225,10 @@ average_questions <- catcolwise( function(my_col) factor(my_col,levels(my_col)[c
 data[,15:19] <- average_questions
 
 data$Q20 <- factor(data$Q20,levels(data$Q20)[c(5,3,1,2,4)], ordered = TRUE)
-
 data$Q22 <- factor(data$Q22,levels(data$Q22)[c(5,2,3,1,4)], ordered = TRUE)
-
 data$Q23 <- factor(data$Q23,levels(data$Q23)[c(2,4,3,1)], ordered = TRUE)
-
 data$Q24 <- factor(data$Q24,levels(data$Q24)[c(5,3,1,2,4)], ordered = TRUE)
-
 data$Q25 <- factor(data$Q25,levels(data$Q25)[c(1,3,2)], ordered = TRUE)
-
 data$Q26 <- factor(data$Q26,levels(data$Q26)[c(1,3,2)], ordered = TRUE)
 
 ```
