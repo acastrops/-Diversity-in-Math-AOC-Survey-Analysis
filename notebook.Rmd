@@ -51,7 +51,7 @@ Conditioned on the self-reported gender and ethinicity.
 
 ## Survey information
 
-The population consists of New College students exclusively, given that only respondents with an *@ncf.edu* email address were allowed to reply. 
+The population consists of New College students exclusively, given that only respondents with an *\@ncf.edu* email address were allowed to reply. 
 
 + New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.
 
@@ -467,7 +467,7 @@ plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
 plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE)
 ```
 
-## Question 4: What is your Area of Concentration?
+### Question 4: What is your Area of Concentration?
 ```{r plot_q4, echo=FALSE, fig.keep='all'}
 q4_data <- mapvalues(plot_data$is_stem_aoc, from = c(TRUE,FALSE), to = c("STEM","Not STEM"))
 q4_title <- "AOC"
