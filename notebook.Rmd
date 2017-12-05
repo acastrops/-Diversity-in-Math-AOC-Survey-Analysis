@@ -289,19 +289,49 @@ For our regression model to be realistic, we must account for the order of the l
 
 ```{r general_predictors}
 is_non_hispanic_white <- as.numeric(data$`Non-Hispanic White`)
-is_minority <- !is_non_hispanic_white
-is_asian <- data$Asian
+is_minority <- as.numeric(!is_non_hispanic_white)
+is_asian <- is.numeric(data$Asian)
 year <- as.numeric(data$Q3) #Survey responses were ordered in cleaning
-is_stem <- data$is_stem_aoc
-#gender <- as.
+is_stem <- as.numeric(data$is_stem_aoc)
+gender <- data$gender
 ```
 
 
 
 ```{r olr_anxiety}
+# https://www.analyticsvidhya.com/blog/2016/02/multinomial-ordinal-logistic-regression/
+
 anxiety_level <- data$Q22
-anxiety_model <- polr(anxiety_level ~  + is_minority + year + is_stem, data = data, Hess = TRUE)
-Summary(anxiety_model)
+anxiety_model <- polr(anxiety_level ~ gender + is_minority + year + is_stem, data = data, Hess = TRUE)
+#summary(anxiety_model)
+
+#probit
+#summary(update(anxiety_model, method = "probit", Hess = TRUE), digits = 3)
+
+#logistic
+#summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
+
+
+# Let's add interaction terms
+# head(predict(anxiety_model, data, type = "p"))
+ #addterm(anxiety_level, ~.^2, test = "Chisq")   ## not working
+ 
+
+#Model selection
+#anxiety_model_2 <- stepAIC(anxiety_model, ~.^2)
+#anxiety_model_2
+
+
+#Anova
+#anxiety_model_2$anova
+#anova(anxiety_model, anxiety_model_2)
+
+#Plot
+anxiety_model_3 <- update(anxiety_model, Hess=TRUE)
+pr <- profile(anxiety_model_3)
+confint(pr)
+plot(pr)
+pairs(pr)
 ```
 
 ```{r olr_confidence_level}
