@@ -287,6 +287,7 @@ Ordinal Regression is an extension of binomial logistics regression. Ordinal reg
 
 For our regression model to be realistic, we must account for the order of the likert items in our response variable. 
 
+
 ```{r general_predictors}
 is_non_hispanic_white <- as.numeric(data$`Non-Hispanic White`)
 is_minority <- as.numeric(!is_non_hispanic_white)
@@ -299,8 +300,6 @@ gender <- data$gender
 
 
 ```{r olr_anxiety}
-# https://www.analyticsvidhya.com/blog/2016/02/multinomial-ordinal-logistic-regression/
-
 anxiety_level <- data$Q22
 anxiety_model <- polr(anxiety_level ~ gender + is_minority + year + is_stem, data = data, Hess = TRUE)
 #summary(anxiety_model)
@@ -332,35 +331,48 @@ pr <- profile(anxiety_model_3)
 confint(pr)
 plot(pr)
 pairs(pr)
+
+#Creating function for the steps above
+get_olr <- function(response, df){
+  model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
+  summary(model)
+  summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
+  model2 <- stepAIC(model, ~.^2)
+  anova(model, model2)
+  #model3 <- update(model, Hess=TRUE)
+  #pr <- profile(model3)
+  #confint(pr)
+  #plot(pr)
+  #pairs(pr)
+  return (model2)
+}
 ```
 
 ```{r olr_confidence_level}
 # Plan is to to the same for following response variables:
 confidence_level <- data$Q16
+get_olr(confidence_level, data)
 ```
 
 ```{r olr_gender_discrimination}
 gender_discrimination_felt <- data$Q25
-
+get_olr(gender_discrimination_felt, data)
 ```
 
 ```{r olr_stereotype}
 stereotype_threat_felt <- data$Q23
-
+get_olr(stereotype_threat_felt, data)
 ```
 
 ```{r olr_racial_discrimination}
 racial_discrimination_felt <- data$Q26
-
+get_olr(racial_discrimination_felt, data)
 ```
 
 ```{r olr_belonging}
 sense_of_belonging <- data$Q24
-
+get_olr(sense_of_belonging, data)
 ```
-
-
-
 
 
 ## Mann-Whitney U test
