@@ -417,7 +417,7 @@ plot_data <- data
 
 assign_ethnicity <- function(record) {
   if (sum(record) > 1) return("Muliethnic")
-  if (sum(record) == 0) return("Unable to Determine")
+  if (sum(record) == 0) return(NA)
   if (record[1] == TRUE) return("Asian")
   if (record[2] == TRUE) return("Black or African American")
   if (record[3] == TRUE) return("Hispanic or Latino")
@@ -435,17 +435,20 @@ plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("
 
 plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
 
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+
 plot_by_gender <- function(question_col,question_title) {
   gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
   gender_plot <- gender_plot + geom_bar(position="fill") + coord_flip()
-  gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title))
+  gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
   return(gender_plot)
 }
 
 plot_by_ethnicity <- function(question_col,question_title) {
   ethnicity_plot <- ggplot(plot_data, aes(x = `Race/Ethnicity`, fill = factor(question_col))) 
   ethnicity_plot <- ethnicity_plot + geom_bar(position="fill") + coord_flip()
-  ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title))
+  ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
   return(ethnicity_plot)
 }
 ```
@@ -457,19 +460,19 @@ raw_gender <- as.character(raw_data$Q1)
 raw_gender[other] <- "Other"
 raw_gender <- data.frame((as.factor(raw_gender)))
 colnames(raw_gender) <- "Gender"
-ggplot(raw_gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE)
+ggplot(raw_gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
 
 ### Question 2: What is your race/ethnicity?
 ```{r plot_q2, echo=FALSE, fig.keep='all'}
 plot_q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
-plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE)
+plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
 
 ### Question 3: What is your year at New College?
 ```{r plot_q3, echo=FALSE, fig.keep='all'}
 plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
-plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE)
+plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
 
 ### Question 4: What is your Area of Concentration?
