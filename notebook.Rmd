@@ -369,6 +369,8 @@ ggplot(data, aes(x=anxiety_level, y=gender))+geom_jitter(size=2, alpha=0.4, posi
   theme_gray()
 ```
 
+\  
+
 #### Anxiety levels
 
 Below we use the `polr` command from the `MASS` package to estimate an ordered logistic regression model. The command name comes from proportional odds logistic regression, highlighting the proportional odds assumption in our model. `polr` uses the standard formula interface in `R` for specifying a regression model with outcome followed by predictors. We also specify `Hess=TRUE` to have the model return the observed information matrix from optimization (called the Hessian) which is used to get standard errors.
@@ -384,17 +386,19 @@ anxiety_model <- polr(anxiety_level ~ gender + is_minority + year + is_stem, dat
 summary(anxiety_model)
 ```
 
+\  
+
 In the output above, we see
 
-+ Call: what type of model we ran, what options we specified, etc.
+1. **Call**: What type of model we ran, what options we specified, etc.
 
-+ Next we see the usual regression output coefficient table including the value of each coefficient, standard errors, and t value, which is simply the ratio of the coefficient to its standard error. There is no significance test by default.
+2. **Coefficients**: Regression output coefficient table including the value of each coefficient, standard errors, and t-value, which is simply the ratio of the coefficient to its standard error. There is no significance test by default.
 
-+ Next we see the estimates for the two intercepts, which are sometimes called cutpoints. The intercepts indicate where the latent variable is cut to make the three groups that we observe in our data. Note that this latent variable is continuous. In general, these are not used in the interpretation of the results. The cutpoints are closely related to thresholds, which are reported by other statistical packages.
+3. **Intercepts**: Sometimes called cutpoints, the intercepts indicate where the latent variable is cut to make the three groups that we observe in our data. Note that this latent variable is continuous. In general, these are not used in the interpretation of the results. 
 
-+ Finally, we see the residual deviance, `-2 * Log Likelihood` of the model as well as the `AIC`. Both the deviance and `AIC` are useful for model comparison.
+4. **Residual deviance**: `-2 * Log Likelihood` of the model as well as the `AIC`. Both the deviance and `AIC` are useful for model comparison.
 
-As said above, the nature of the test does not include a p-value by default. However, one way to calculate it in this case is by comparing the t-value against the standard normal distribution, like a z test. Of course this is only true with infinite degrees of freedom, but is reasonably approximated by large samples, becoming increasingly biased as sample size decreases.
+As said above, the nature of the test does not include a p-value by default. However, one way to calculate it in this case is by comparing the t-value against the standard normal distribution, like a z-test. Of course this is only true with infinite degrees of freedom, but is reasonably approximated by large samples, becoming increasingly biased as sample size decreases.
 
 \  
 
@@ -406,7 +410,7 @@ First we store the coefficient table, then calculate the pvalues and combine bac
 
 \  
 
-Calculating and store p-values:
+Calculating and storing p-values:
 
 ```{r olr_p_values, eval=TRUE, echo=TRUE}
 p_values <- pnorm(abs(coefficients_table[, "t value"]), lower.tail = FALSE) * 2
@@ -424,9 +428,11 @@ We can also get confidence intervals for the parameter estimates. These can be o
 confint.default(anxiety_model) # CIs assuming normality
 ```
 
-The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do. The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a 1.10 increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
+\  
 
-For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a 0.73 increase in the expected value of apply in the log odds scale, given that all of the other variables in the model are held constant.
+The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do. The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a `1.10` increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `0.73` increase in the expected value of apply in the log odds scale, given that all of the other variables in the model are held constant.
 
 The coefficients from the model can be somewhat difficult to interpret because they are scaled in terms of logs. Another way to interpret logistic regression models is to convert the coefficients into odds ratios. To get the OR and confidence intervals, we just exponentiate the estimates and confidence intervals.
 
@@ -434,24 +440,38 @@ The coefficients from the model can be somewhat difficult to interpret because t
 ## Odds ratios (OR)
 exp(coef(anxiety_model))
 ```
+\  
+
+Combining the two:
 
 ```{r}
 ## OR and CI
 exp(cbind(OR = coef(anxiety_model), olr_ci))
 ```
 
-These coefficients are called proportional odds ratios and we would interpret these pretty much as we would odds ratios from a binary logistic regression. For `gender`, we would say that for a one unit increase in `gender`, i.e., going from 0 (Not male) to 1 (Male), the odds of "Much more anxiety" applying versus "A little more anxiety" or "Much less anxiety" applying combined are 3.02 greater, given that all of the other variables in the model are held constant. Likewise, the odds "Much more anxiety" or "A little more anxiety" applying versus "Much less anxiety" applying is 3.01 times greater, given that all of the other variables in the model are held constant. 
+\  
 
+These coefficients are called proportional odds ratios and we would interpret these pretty much as we would odds ratios from a binary logistic regression. 
+
+For `gender`, we would say that for a one unit increase in `gender`, i.e., going from `0` (Not male) to `1` (Male), the odds of *"Much more anxiety"* applying versus *"A little more anxiety"* or *"Much less anxiety"* applying combined are `3.02` greater, given that all of the other variables in the model are held constant. 
+
+Likewise, the odds *"Much more anxiety"* or *"A little more anxiety"* applying versus *"Much less anxiety"* applying is `3.02` times greater, with all things constant. 
+
+\  
+
+Now to automate everything:
 
 ```{r olr_function}
 #Creating function for the steps above
 get_olr <- function(response, df){
   model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
   summary(model)
-  summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
-  model2 <- stepAIC(model, ~.^2)
-  anova(model, model2)
-  return (model2)
+  coefficients_table <- coef(summary(model))
+  p_values <- pnorm(abs(coefficients_table[, "t value"]), lower.tail = FALSE) * 2
+  coefficients_table <- cbind(coefficients_table, "p value" = p_values)
+  olr_ci <- confint(model)
+  exp <- exp(cbind(OR = coef(model), olr_ci))
+  return (list(olr_ci, exp))
 }
 ```
 
@@ -459,9 +479,11 @@ get_olr <- function(response, df){
 
 #### Confidence level
 
-```{r olr_confidence_level}
-# Plan is to to the same for following response variables:
+```{r olr_confidence_level, eval=FALSE}
+# Grabing our response variable from question 16
 confidence_level <- data$Q16
+
+# Calling OLR
 get_olr(confidence_level, data)
 ```
 
@@ -469,7 +491,7 @@ get_olr(confidence_level, data)
 
 #### Gender Discrimination
 
-```{r olr_gender_discrimination}
+```{r olr_gender_discrimination, eval=FALSE}
 gender_discrimination_felt <- data$Q25
 get_olr(gender_discrimination_felt, data)
 ```
@@ -478,7 +500,7 @@ get_olr(gender_discrimination_felt, data)
 
 #### Stereotype threat
 
-```{r olr_stereotype}
+```{r olr_stereotype, eval=FALSE}
 stereotype_threat_felt <- data$Q23
 get_olr(stereotype_threat_felt, data)
 ```
@@ -487,7 +509,7 @@ get_olr(stereotype_threat_felt, data)
 
 #### Gender discrimination
 
-```{r olr_racial_discrimination}
+```{r olr_racial_discrimination, eval=FALSE}
 racial_discrimination_felt <- data$Q26
 get_olr(racial_discrimination_felt, data)
 ```
@@ -496,7 +518,7 @@ get_olr(racial_discrimination_felt, data)
 
 #### Sense of belonging
 
-```{r olr_belonging}
+```{r olr_belonging, eval=FALSE}
 sense_of_belonging <- data$Q24
 get_olr(sense_of_belonging, data)
 ```
@@ -596,7 +618,7 @@ where the specified distribution would be the one corresponding to the national 
 plot_data <- data
 
 assign_ethnicity <- function(record) {
-  if (sum(record) > 1) return("Muliethnic")
+  if (sum(record) > 1) return("Multiethnic")
   if (sum(record) == 0) return(NA)
   if (record[1] == TRUE) return("Asian")
   if (record[2] == TRUE) return("Black or African American")
@@ -618,14 +640,14 @@ plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 
-plot_by_gender <- function(question_col,question_title) {
+plot_by_gender <- function(question_col, question_title) {
   gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
   gender_plot <- gender_plot + geom_bar(position="fill") + coord_flip()
   gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
   return(gender_plot)
 }
 
-plot_by_ethnicity <- function(question_col,question_title) {
+plot_by_ethnicity <- function(question_col, question_title) {
   ethnicity_plot <- ggplot(plot_data, aes(x = `Race/Ethnicity`, fill = factor(question_col))) 
   ethnicity_plot <- ethnicity_plot + geom_bar(position="fill") + coord_flip()
   ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
@@ -831,3 +853,6 @@ q26_data <- plot_data$Q26
 q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
 plot_by_ethnicity(q26_data,q26_title) 
 ```
+
+# Conclusion
+
