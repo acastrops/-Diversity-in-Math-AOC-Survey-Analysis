@@ -186,13 +186,13 @@ gender_col <- as.factor(gender_col)
 data$Q1 <- gender_col
 ```
 
-\  
+\
 
 For clarity, we add a column named `gender` that maps `Male` to `1` and `Not Male` to `0` to be used in the logistic regression as a binary variable:
 
 ```{r normalizing_gender_olr}
 map_gender <- function(rec) {
-  if (rec == "Male") return(1) else return(0) 
+  if (rec == "Male") return(1) else return(0)
 }
 gender <- sapply(X = data$Q1, FUN = map_gender)
 data <- cbind(data,gender)
@@ -337,15 +337,13 @@ For our regression model to be realistic, we must account for the order of the l
 
 ```{r general_predictors}
 # Ethnicity
-is_non_hispanic_white <- as.numeric(data$`Non-Hispanic White`)
+is_non_hispanic_white <- data$`Non-Hispanic White`
 is_minority <- as.numeric(!is_non_hispanic_white)
-is_asian <- is.numeric(data$Asian)
+is_asian <- as.numeric(data$Asian)
 # What year the student is in
 year <- as.numeric(data$Q3) #Survey responses were ordered in cleaning
 # Whether the student's AOC is stem or not
 is_stem <- as.numeric(data$is_stem_aoc)
-# Gender
-gender <- data$gender
 ```
 
 \  
@@ -358,18 +356,35 @@ ftable(xtabs(~ gender + is_minority + year + is_stem, data = data))
 
 \  
 
-As discussed in previous section, `gender` is a binary variable where `1` corresponds to male and `0` to non-male students. `is_minority` groups students into whether or not are non-hispanic white (i.e., belong to the majortiy of population in Florida), `0`, or if they are of other ethicities, `1`. `year` corresponds to whether a student is a freshman, `1`, sophomore, `2`, junior `3`, senior `4`, or they are doing an extra year or more `5`. `is_stem` corresponds to whether their AOC is STEM, `1` or not, `0`. We can also examine the distribution of `gender` at every level of `anxiety_level`. To do this, we use the `ggplot2` package:
+As discussed in previous section, `gender` is a binary variable where `1` corresponds to male and `0` to non-male students. `is_minority` groups students into whether or not are non-hispanic white (i.e., belong to the majortiy of population in Florida), `0`, or if they are of other ethicities, `1`. `year` corresponds to whether a student is a freshman, `1`, sophomore, `2`, junior `3`, senior `4`, or they are doing an extra year or more `5`. `is_stem` corresponds to whether their AOC is STEM, `1` or not, `0`. We can also examine the distribution of `gender` at every level of `anxiety_level` responses. To do this we use 
 
-```{r}
-ggplot(data, aes(x=anxiety_level, y=gender))+geom_jitter(size=2, alpha=0.4, position = position_jitter(height = .02))+
-  stat_smooth(method="loess", colour="blue", size=1.5)+
-  scale_y_continuous(breaks=seq(0,1)) +
-  xlab("Anxiety Level") +
-  ylab("Gender") +
-  theme_gray()
+Compared to other subjects, do you feel more or less anxiety in mathematics classes?
+```{r echo=FALSE, fig.keep='all'}
+q22_data <- plot_data$Q22
+q22_title <- "More or less anxiety\nin math classes?"
+plot_by_gender(q22_data,q22_title)
+plot_by_ethnicity(q22_data,q22_title)
 ```
 
-\  
+<!-- barplot(table(gender,anxiety_level),beside=T, -->
+<!-- cex.names=0.7,legend.text=c("Not Male","Male"), -->
+<!-- args.legend=list(x=15,y=65,cex=0.8), -->
+<!-- density = seq(4,40,length.out=2), -->
+<!-- angle=c(-60,60), -->
+<!-- main = "Compared to other subjects, do you feel more or -->
+<!-- less anxiety in mathematics classes?", -->
+<!-- col=c("black","black")) -->
+
+<!-- ```{r graph, echo=FALSE} -->
+<!-- ggplot(data, aes(x=anxiety_level, y=gender))+geom_jitter(size=2, alpha=0.4, position = position_jitter(height = .02))+ -->
+<!--   scale_y_discrete(breaks=seq(0,1)) + -->
+<!--   xlab("Anxiety Level") + -->
+<!--   ylab("Gender") + -->
+<!--   ggtitle("Compared to other subjects, do you feel more or less anxiety in math classes?") + -->
+<!--   theme_gray() -->
+
+
+<!-- ``` -->
 
 #### Anxiety levels
 
@@ -424,13 +439,18 @@ p_values <- pnorm(abs(coefficients_table[, "t value"]), lower.tail = FALSE) * 2
 We can also get confidence intervals for the parameter estimates. These can be obtained either by profiling the likelihood function or by using the standard errors and assuming a normal distribution. Note that profiled CIs are not symmetric (although they are usually close to symmetric). If the 95% CI does not cross 0, the parameter estimate is statistically significant.
 
 ```{r olr_ci}
-(olr_ci <- confint(anxiety_model)) # default method gives profiled CIs
-confint.default(anxiety_model) # CIs assuming normality
+# default method gives profiled CIs
+# suppressMessages() is included to supress the warning
+(suppressMessages(olr_ci <- confint(anxiety_model))) 
+# CIs assuming normality
+confint.default(anxiety_model) 
 ```
 
 \  
 
-The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do. The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a `1.10` increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
+The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do: **There is evidence to support that a student's gender and AOC are statistically significant predictors of their reported anxiety levels.**
+
+The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a `1.10` increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
 
 For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `0.73` increase in the expected value of apply in the log odds scale, given that all of the other variables in the model are held constant.
 
@@ -465,13 +485,14 @@ Now to automate everything:
 #Creating function for the steps above
 get_olr <- function(response, df){
   model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
-  summary(model)
   coefficients_table <- coef(summary(model))
+  summary <- summary(model)
   p_values <- pnorm(abs(coefficients_table[, "t value"]), lower.tail = FALSE) * 2
   coefficients_table <- cbind(coefficients_table, "p value" = p_values)
-  olr_ci <- confint(model)
+  coefficients <- summary(model)$coefficients[1:4,1]
+  suppressMessages(olr_ci <- confint(model))
   exp <- exp(cbind(OR = coef(model), olr_ci))
-  return (list(olr_ci, exp))
+  return (list(paste("Summary"), summary, paste("Confidence intervals:"),olr_ci, paste("Exponentiated estimates, OR, and CI:"), exp))
 }
 ```
 
@@ -479,7 +500,7 @@ get_olr <- function(response, df){
 
 #### Confidence level
 
-```{r olr_confidence_level, eval=FALSE}
+```{r olr_confidence_level}
 # Grabing our response variable from question 16
 confidence_level <- data$Q16
 
@@ -489,18 +510,48 @@ get_olr(confidence_level, data)
 
 \  
 
++ `Confidence interval`
+
+The confidence intervals for `gender`, `year`, and `is_stem` do not include 0; `is_minority` does: **There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels.**
+
+We would say that for a one unit increase in `gender` (from not male to male), we expect a `1.15` increase in the expected value of `confidence_levels` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `year`, we would say that for a one unit increase in `year`, we would expect a `0.29` increase in the expected value of `confidence_levels` in the log odds scale, given that all of the other variables in the model are held constant.
+
+For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `1.40` increase in the expected value of `confidence_levels` in the log odds scale, given that all of the other variables in the model are held constant.
+
++ `OR and CI`
+
+For `gender`, we would say that for a one unit increase in `gender`, i.e., going from `0` (Not male) to `1` (Male), the odds of *"Well above average"* applying versus *"Above average"* or *"Well below average"* applying combined are `3.15` greater, given that all of the other variables in the model are held constant. Likewise, the odds *"Well above average"* or *"Above average"* applying versus *"Well below average"* applying is `3.15` times greater, with all things constant. 
+
+\  
+
 #### Gender Discrimination
 
-```{r olr_gender_discrimination, eval=FALSE}
+```{r olr_gender_discrimination}
 gender_discrimination_felt <- data$Q25
 get_olr(gender_discrimination_felt, data)
 ```
 
 \  
 
++ `Confidence interval`
+
+The confidence intervals for `gender`, and `year` do not include 0; `is_minority` and `is_stem` do: **There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination.**
+
+We would say that for a one unit increase in `gender` (from not male to male), we expect a `2.43` *decrease* in the expected value of `gender_discrimination_felt` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `year`, we would say that for a one unit increase in `year`, we would expect a `0.32` increase in the expected value of `gender_discrimination_felt` in the log odds scale, given that all of the other variables in the model are held constant.
+
++ `OR and CI`
+
+For `gender`, we would say that for a one unit increase in `gender`, i.e., going from `0` (Not male) to `1` (Male), the odds of *"Yes, at New College and possibly elsewhere"* applying versus *"Yes, but **not** at New College"* or *"No"* applying combined are `2.23` lower, given that all of the other variables in the model are held constant.
+
+\  
+
 #### Stereotype threat
 
-```{r olr_stereotype, eval=FALSE}
+```{r olr_stereotype}
 stereotype_threat_felt <- data$Q23
 get_olr(stereotype_threat_felt, data)
 ```
@@ -637,7 +688,7 @@ plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("
 
 plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
 
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbPalette <- c("#4e5d90", "#9ba6ce", "#d9e8f0", "#c3c3c3", "#5a5858")
 
 
 plot_by_gender <- function(question_col, question_title) {
