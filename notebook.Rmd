@@ -131,6 +131,10 @@ Future considerations:
 \  
 We start by reading in the anonymized data from the file:
 
+```{r echo=FALSE}
+raw <- read.csv("survey_responses.csv",nrows = 264)
+```
+
 
 ```{r read_data}
 # Reading data in
@@ -306,12 +310,12 @@ to_three_agrees <- function(fctr){
 
 The actual EV is:
 
-```{r crosstab_socialgroup_example, eval=FALSE}
+```{r crosstab_socialgroup_example, eval=TRUE, echo=TRUE}
 gender_vs_social_group_perception <- table(data$Q1, data$Q17)
 gender_vs_social_group_perception
 ```
 
-```{r crosstab_socialgroup_3groups}
+```{r crosstab_socialgroup_3groups, eval=TRUE, echo=TRUE}
 gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
 gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
@@ -324,7 +328,9 @@ When performing a chi-squared test of independence, we do not find a significant
 
 ## Logistic Regression
 
-Ordinal Regression is an extension of binomial logistics regression. Ordinal regression is used to predict the dependent variable with 'ordered' multiple categories and independent variables. In other words, it is used to facilitate the interaction of dependent variables (having multiple ordered levels) with one or more independent variables.
+Ordinal Regression is an extension of binomial logistics regression; it is used to predict the dependent variable with 'ordered' multiple categories and independent variables. In other words, we use it to facilitate the interaction of dependent variables (having multiple ordered levels) with one or more independent variables. 
+
+In this report, our dependent variables will be the issues we are trying to study: anxiety levels, sense of belonging, discrimination felt, etc. The independent variables will be gender, ethinicity, year, AOC because we are trying to see if there is any evidence of a relationship between those specific characteristics and the issues mentioned above.
 
 For our regression model to be realistic, we must account for the order of the likert items in our response variable. 
 
@@ -344,7 +350,7 @@ gender <- data$gender
 
 \  
 
-Let’s start with the descriptive statistics of these variables:
+Let's start with the descriptive statistics of these variables:
 
 ```{r olr_descriptive_statistics}
 ftable(xtabs(~ gender + is_minority + year + is_stem, data = data))
@@ -363,40 +369,81 @@ ggplot(data, aes(x=anxiety_level, y=gender))+geom_jitter(size=2, alpha=0.4, posi
   theme_gray()
 ```
 
+#### Anxiety levels
 
-```{r olr_anxiety}
+Below we use the `polr` command from the `MASS` package to estimate an ordered logistic regression model. The command name comes from proportional odds logistic regression, highlighting the proportional odds assumption in our model. `polr` uses the standard formula interface in `R` for specifying a regression model with outcome followed by predictors. We also specify `Hess=TRUE` to have the model return the observed information matrix from optimization (called the Hessian) which is used to get standard errors.
+
+```{r OLR_function, eval=TRUE, echo=TRUE, warning=FALSE}
+# Getting responses from question 22
 anxiety_level <- data$Q22
+
+# Fit ordered logit model and store results in 'anxiety_model'
 anxiety_model <- polr(anxiety_level ~ gender + is_minority + year + is_stem, data = data, Hess = TRUE)
-#summary(anxiety_model)
 
-#probit
-#summary(update(anxiety_model, method = "probit", Hess = TRUE), digits = 3)
+# View a summary of the model
+summary(anxiety_model)
+```
 
-#logistic
-#summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
+In the output above, we see
+
++ Call: what type of model we ran, what options we specified, etc.
+
++ Next we see the usual regression output coefficient table including the value of each coefficient, standard errors, and t value, which is simply the ratio of the coefficient to its standard error. There is no significance test by default.
+
++ Next we see the estimates for the two intercepts, which are sometimes called cutpoints. The intercepts indicate where the latent variable is cut to make the three groups that we observe in our data. Note that this latent variable is continuous. In general, these are not used in the interpretation of the results. The cutpoints are closely related to thresholds, which are reported by other statistical packages.
+
++ Finally, we see the residual deviance, `-2 * Log Likelihood` of the model as well as the `AIC`. Both the deviance and `AIC` are useful for model comparison.
+
+As said above, the nature of the test does not include a p-value by default. However, one way to calculate it in this case is by comparing the t-value against the standard normal distribution, like a z test. Of course this is only true with infinite degrees of freedom, but is reasonably approximated by large samples, becoming increasingly biased as sample size decreases.
+
+\  
+
+First we store the coefficient table, then calculate the pvalues and combine back with the table. Storing the table:
+
+```{r olr_table}
+(coefficients_table <- coef(summary(anxiety_model)))
+```
+
+\  
+
+Calculating and store p-values:
+
+```{r olr_p_values, eval=TRUE, echo=TRUE}
+p_values <- pnorm(abs(coefficients_table[, "t value"]), lower.tail = FALSE) * 2
+
+# Combined table
+(coefficients_table <- cbind(coefficients_table, "p value" = p_values))
+```
+
+\  
+
+We can also get confidence intervals for the parameter estimates. These can be obtained either by profiling the likelihood function or by using the standard errors and assuming a normal distribution. Note that profiled CIs are not symmetric (although they are usually close to symmetric). If the 95% CI does not cross 0, the parameter estimate is statistically significant.
+
+```{r olr_ci}
+(olr_ci <- confint(anxiety_model)) # default method gives profiled CIs
+confint.default(anxiety_model) # CIs assuming normality
+```
+
+The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do. The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a 1.10 increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a 0.73 increase in the expected value of apply in the log odds scale, given that all of the other variables in the model are held constant.
+
+The coefficients from the model can be somewhat difficult to interpret because they are scaled in terms of logs. Another way to interpret logistic regression models is to convert the coefficients into odds ratios. To get the OR and confidence intervals, we just exponentiate the estimates and confidence intervals.
+
+```{r}
+## Odds ratios (OR)
+exp(coef(anxiety_model))
+```
+
+```{r}
+## OR and CI
+exp(cbind(OR = coef(anxiety_model), olr_ci))
+```
+
+These coefficients are called proportional odds ratios and we would interpret these pretty much as we would odds ratios from a binary logistic regression. For `gender`, we would say that for a one unit increase in `gender`, i.e., going from 0 (Not male) to 1 (Male), the odds of "Much more anxiety" applying versus "A little more anxiety" or "Much less anxiety" applying combined are 3.02 greater, given that all of the other variables in the model are held constant. Likewise, the odds "Much more anxiety" or "A little more anxiety" applying versus "Much less anxiety" applying is 3.01 times greater, given that all of the other variables in the model are held constant. 
 
 
-# Let's add interaction terms
-# head(predict(anxiety_model, data, type = "p"))
- #addterm(anxiety_level, ~.^2, test = "Chisq")   ## not working
- 
-
-#Model selection
-#anxiety_model_2 <- stepAIC(anxiety_model, ~.^2)
-#anxiety_model_2
-
-
-#Anova
-#anxiety_model_2$anova
-#anova(anxiety_model, anxiety_model_2)
-
-#Plot
-anxiety_model_3 <- update(anxiety_model, Hess=TRUE)
-pr <- profile(anxiety_model_3)
-confint(pr)
-plot(pr)
-pairs(pr)
-
+```{r olr_function}
 #Creating function for the steps above
 get_olr <- function(response, df){
   model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
@@ -404,14 +451,13 @@ get_olr <- function(response, df){
   summary(update(anxiety_model, method = "logistic", Hess = TRUE), digits = 3)
   model2 <- stepAIC(model, ~.^2)
   anova(model, model2)
-  #model3 <- update(model, Hess=TRUE)
-  #pr <- profile(model3)
-  #confint(pr)
-  #plot(pr)
-  #pairs(pr)
   return (model2)
 }
 ```
+
+\  
+
+#### Confidence level
 
 ```{r olr_confidence_level}
 # Plan is to to the same for following response variables:
@@ -419,20 +465,36 @@ confidence_level <- data$Q16
 get_olr(confidence_level, data)
 ```
 
+\  
+
+#### Gender Discrimination
+
 ```{r olr_gender_discrimination}
 gender_discrimination_felt <- data$Q25
 get_olr(gender_discrimination_felt, data)
 ```
+
+\  
+
+#### Stereotype threat
 
 ```{r olr_stereotype}
 stereotype_threat_felt <- data$Q23
 get_olr(stereotype_threat_felt, data)
 ```
 
+\  
+
+#### Gender discrimination
+
 ```{r olr_racial_discrimination}
 racial_discrimination_felt <- data$Q26
 get_olr(racial_discrimination_felt, data)
 ```
+
+\  
+
+#### Sense of belonging
 
 ```{r olr_belonging}
 sense_of_belonging <- data$Q24
@@ -441,9 +503,20 @@ get_olr(sense_of_belonging, data)
 
 \  
 
+#### Things to consider
+
+1. **Sample size:** Both ordered logistic and ordered probit, using maximum likelihood estimates, require sufficient sample size. How big is big is a topic of some debate, but they almost always require *more* cases than OLS regression.
+
+2. **Pseudo-R-squared:** There is no exact analog of the R-squared found in OLS. There are many versions of pseudo-R-squares. 
+
+3. **Diagnostics:** Doing diagnostics for non-linear models is difficult, and ordered logit/probit models are even more difficult than binary models.
+
+\  
+\  
+
 ## Mann-Whitney U test
 
-The Mann–Whitney U test is a nonparametric test of the null hypothesis that it is equally likely that a randomly selected value from one sample will be less than or greater than a randomly selected value from a second sample. Unlike the t-test it does not require the assumption of normal distributions. This test can be used to determine whether two independent samples were selected from populations having the same distribution. 
+The Mann-Whitney U test is a nonparametric test of the null hypothesis that it is equally likely that a randomly selected value from one sample will be less than or greater than a randomly selected value from a second sample. Unlike the t-test it does not require the assumption of normal distributions. This test can be used to determine whether two independent samples were selected from populations having the same distribution. 
 
 Defining the function to perform the test:
 
@@ -458,9 +531,11 @@ get_mann_whitney <- function(ind_col, dep_col, df) {
 
 ***
 
-**Question 7:** Are you interested in graduate school (in any discipline)? 
+**Question 7:** *Are you interested in graduate school (in any discipline)?* 
 
 **Possible answers:** "No", "Maybe", or "Yes" 
+
+***
 
 All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
 
@@ -479,11 +554,11 @@ With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that
 
 ***
 
-\  
-
-**Question 23:** How often are you concerned that your performance in math will confirm a negative stereotype about you?  
+**Question 23:** *How often are you concerned that your performance in math will confirm a negative stereotype about you?* 
 
 **Possible answers:** "Often", "Sometimes", "Rarely", or "Never"
+
+***
 
 All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
 
