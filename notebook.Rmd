@@ -1103,80 +1103,215 @@ q17_data <- plot_data$Q17
 q17_title <- "Rate your math skills \n compared to your \n social group. \n "
 plot_by_gender(q17_data,q17_title)
 ```
+\  
+
+Both gender groupings have similar answers, with male respondents rating themselves "Well above average" and "Above average" slightly more often than non-male students when comparing their mathematical ability to their social group.
+
+\  
 
 ```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q17_data,q17_title)
 ```
+\  
+
+Most groups rate themselves between "Well above average" and "Average" for the vast majority, with the exception of Asian respondents who marked "Well above average" and "Above average" more often than "Average."
+
+\  
 
 ## Rate your mathematical ability compared to other students of your gender.
+\  
+
 ```{r plot_q18, echo=FALSE, fig.keep='all'}
 q18_data <- plot_data$Q18
-q18_title <- "Rate your math skills\ncompared to students\nof your gender."
+q18_title <- "Rate your math skills \n compared to students \n of your gender. \n"
 plot_by_gender(q18_data,q18_title)
+```
+\  
+
+When comparing their mathematical ability to other students of the same gender, both groups reported to be "Average" quite a lot, with male students responding more than twice as much with "Well above average" and more with "Above average." The male students also reported less to being "Well below average" or "Below average" than the non-male students. 
+
+Keep in mind that because of the binary grouping of gender into male and non-male, some information is lost when it comes to non-binary respondents because it gets lost with the female responses.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q18_data,q18_title)
 ```
 
+\  
+
+When accounting for ethnicity, people seemed to pick less extreme responses to this question, in fact, Asian respondents only used "Above average" and "Average" responses. The group who feels more inferior to their gender counterparts is the Hispanic/Latino group, with the highest percentage of "Well below average" responses.
+
+\  
+
 ## Rate your mathematical ability compared to other students of your racial ethnic group.
+\  
+
 ```{r plot_q19, echo=FALSE, fig.keep='all'}
 q19_data <- plot_data$Q19
-q19_title <- "Rate your math skills\ncompared to students\nof your racial ethnic\ngroup."
+q19_title <- "Rate your math skills \n compared to students\n of your racial ethnic \n group. \n "
 plot_by_gender(q19_data,q19_title)
+```
+\  
+
+When comparing to their ethnic group, both gender groups seem to report a similar percentage of "Well below average" with male respondents once more having the higher rates of "Well above average" and "Above average" while the non-male respondents have the higher rates of "Below average" and "Average." 
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q19_data,q19_title)
 ```
+\  
+
+African American respondents stand out from other groups with a majority of "Well above average" and "Above average" responses when comparing their mathematical ability with other students of their racial ethnic group. Asian respondents report the highest percentage of "Well below average" when compared to students of the same ethnicity, witha  large portion of responses being "Average" and a very low number of responses being "Above average" and "Well above average," which contrasts to the group's response to the previous question where they answered with "Well above average" and "Above average" most of the time when comparing their mathematical skills to their high school population and social groups and New College population.
+
+\  
 
 ## Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
+\  
+
 ```{r plot_q20, echo=FALSE, fig.keep='all'}
 q20_data <- plot_data$Q20
-q20_title <- "Likelihood of dropping\na difficult math class."
+q20_title <- "Likelihood of dropping \n a difficult math class. \n "
 plot_by_gender(q20_data,q20_title)
+```
+\  
+
+Male respondents tend to be much less likely to drop a class in that situation while non-male students report higher percentages of both "Very likely" and "Somewhat likely" when compared to males.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q20_data,q20_title)
 ```
+\  
+
+Asian respondents report the highest percentage of being "Very unlikely" to drop a class in those circumstances while Hispanic/Latino and Multiethnic students show the highest percentages of being "Very likely" to do so. 
+
+\  
 
 ## Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
+\  
+
 ```{r plot_q21, echo=FALSE, fig.keep='all'}
 q21_data <- plot_data$Q21
-q21_title <- "Ever dropped a\ndifficult math class?"
+q21_title <- "Ever dropped a \n difficult math class? \n "
 plot_by_gender(q21_data,q21_title)
+```
+\  
+
+The majority of both groups have reported to have never dropped a difficult math class. Of those that did, non-male students report a slightly higher percentage than males for having done so.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q21_data,q21_title)
 ```
+\  
+
+Asian respondest have, by far, the lowest percentage for having dropped a difficult math class, in accordance to the group's response to the previous question relating to how they would handle struggling with a math class at first. In contrast, Hispanic/Latino, African American, and Multiethnic respondents have the highest percentages for having done so but all groups report a vast majority of "No."
+
+\  
 
 ## Compared to other subjects, do you feel more or less anxiety in mathematics classes?
+\  
+
 ```{r plot_q22, echo=FALSE, fig.keep='all'}
 q22_data <- plot_data$Q22
-q22_title <- "More or less anxiety\nin math classes?"
+q22_title <- "More or less anxiety \n in math classes? \n "
 plot_by_gender(q22_data,q22_title)
+```
+\  
+
+Non-male students report significantly higher percentages of "Much more anxiety" and anxiety levels in general when compared to male counterparts, who also were twice as likely to report "Much less anxiety" when compared with non-male students, and only a third of the non-male "Much more anxiety" percentage.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q22_data,q22_title)
 ```
+\  
+
+Throuought the groups, the majority of respondents report having between "Much more anxiety" and "A little more anxiety" while the respondents who identify as Multiethnic report higher levels in general of "Much more anxiety."
+
+\  
 
 ## How often are you concerned that your performance in math will confirm a negative stereotype about you?
+\  
+
 ```{r plot_q23, echo=FALSE, fig.keep='all'}
 q23_data <- plot_data$Q23
-q23_title <- "Frequency of concerns\nthat your math abilities\nwill confirm negative\nstereotypes?"
+q23_title <- "Frequency of concerns \n that your performance in \n math will confirm negative \n stereotypes about them \n "
 plot_by_gender(q23_data,q23_title)
+```
+\  
+
+The majority of male students replied with "Never" while the majority of non-male students replied with a combination of "Often" and "Sometimes."
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q23_data,q23_title)
 ```
+\  
+
+Asian, African American, and Hispanic/Latino students report the highest percentage of "Often" and "Sometimes" responses, while Multiethnic and White respondents have the highest percentages of "Never" responses.
+
+\  
 
 ## Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
+\  
+
 ```{r plot_q24, echo=FALSE, fig.keep='all'}
 q24_data <- plot_data$Q24
-q24_title <- "Feel comfortable\nor out of place in\nNCF math class?"
+q24_title <- "Feel comfortable \n or out of place in\n NCF math class? \n "
 plot_by_gender(q24_data,q24_title)
+```
+\  
+
+The majority of male students report higher levels of "Very comfortable" and "Somewhat comfortable" in New College math classes while almost 50\% of non-male students report "Very out of place" and "Somewhat out of place." This could be perhaps a good place to start asking concrete questions to students about what could be done to alleviate the situation. 
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q24_data,q24_title)
 ```
+\  
+
+All groups have similarly distributed responses, with the exception of Asian respondents who never reported to feel "Very out of place." 
+
+\  
 
 ## Have you ever felt that you were perceived or treated differently in a math class due to your gender?
+\  
+
 ```{r plot_q25, echo=FALSE, fig.keep='all'}
 q25_data <- plot_data$Q25
-q25_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour gender?"
+q25_title <- "Ever felt you were \n treated differently in \n math class due to \n your gender? \n "
 plot_by_gender(q25_data,q25_title) 
 ```
+\  
+
+The *vast* majority of male respondents report "No", while almost 50\% of non-male respondents report "Yes."
+
+\  
 
 ## Have you ever felt that you were perceived or treated differently in a math class due to your race or ethnicity?
+\  
+
 ```{r plot_q26, echo=FALSE, fig.keep='all'}
 q26_data <- plot_data$Q26
-q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
+q26_title <- "Ever felt you were \n treated differently in \n math class due to \n your race or ethnicity?"
 plot_by_ethnicity(q26_data,q26_title) 
 ```
+\  
+
+Asian and Black/Afrincan American, and Multiethnic respondents report to have felt some form of racial discrimination while at NCF and elsewhere. Asian respondents have very low levels of "No" responses, with a large number of "Yes, but not at NCF" responses as well. Other groups have a majority of "No" responses.
+\  
+
+
+
+\  
 
 # Conclusion
 
@@ -1206,6 +1341,93 @@ In the case of question 17, “How would you rate your mathematical ability, com
 
 \  
 
+## Comments
+
+Below are some comments included in the survey:
+\  
+
+
+***
+
+*Thank you for beginning to address disparities in the math department. I think that the department could be strengthened immensely with more work at helping non male, non white students feel comfortable.* 
+
+*** 
+
+*In my opinion, there is a bit of disparity in the STEM field when it comes to diversity. I know places like NYU have pushed programs like "Women in STEM" which is geared towards having high retention rates for women is STEM majors.  I feel like New College is a great liberal arts college with a focus on research. We, as a school in general, need to outreach to a more diverse population (ESPECIALLY when it comes to Math and NatSci AOCs).*
+
+***
+
+*I believe that NCF's math department is too theoretical. I had orginally come to college thinking I'd be an Applied Math AOC. My decision to switch had nothing really to do with the math department however. What I did notice though was that there weren't too many courses dedicated to real life application of math concepts. Additionally, and this goes for NCF as a whole, there needs to be gender and racial/ethnic diversity reflected amongst students, faculty, admin. and staff in order to truly be diverse.*
+
+*** 
+*As a student who needs academic accommodations, I feel that I have absolutely been treated differently in math classes across the board... in my experience, math teachers in general are more grudging to accommodate disabled students' needs in ways that teachers of other disciplines are more willing to do. (E.g.: you don't need to use a calculator, you should be able to do fast mental math just like everyone else)*
+
+***
+
+*With the stereotype question, you only address negative stereotypes. I'd also like to note that there is the phenomenon of "not confirming positive stereotypes" that can affect people as well, especially with groups as stereotyped as Asians are (i.e. the "Model Minority" stereotype). I have experienced, and read sociology papers that address the experience, of Asian American students feeling pressured to be better at math due to their race. There is also the experience of being worried that you're a "bad Asian" because you're "bad at math".*
+
+***
+
+*Thanks for this survey! It’s important to address issues of diversity in specific fields.*
+
+***
+
+*I find that a lot of students who identify as male are more likely to speak out and answer questions than other students in class. I feel more time should be given and hands should be raised so that all students get a chance to process the question and answer it.*
+
+***
+
+*I did well in math, never had to study for a test and still did well, until I hit Calculus.  Even with studying, I don't do well.*
+
+***
+
+*I think the change of name of the course from Calc with Theory to Honors Calculus was a very conscious and good-hearted decision, but I think it does not accurately reflect the difficulty and degree of difference of the course content when it is compared to a standard Honors Calc class at another college.* 
+
+*I also am very thankful for all of the professors in the math department. They have always made me feel as capable and supported as I could ever imagine. Changing from studying science to studying philosophy, I'm still in a male-dominated environment and feel that math was much less toxic of an environment for women. I feel that women just tend to have a harder time doing things that are deemed to be more "useless" in society's eye (i.e. math and philosophy due to their abstract nature) and perhaps just celebrating the uniqueness of these more abstract subjects and educating first-year students on the nature of these subjects and the styles of thinking and approach that are taken would be good for women to hear. Instead of hearing their area of interest is useless and diverting them from it, they could hear that people like to think about theory (for instance, in philosophy) and the way things work in the world would like to be a part of the program.*
+
+*I am also so happy this survey went out! There is a similar mechanism in the philosophy department due to the gender disparity and I am very glad it is happening here now. Thanks for all you all do!*
+
+***
+
+*Thank you for addressing the huge disparities in New College's math program. This is important data!*
+
+***
+
+*Very cool that you all put this survey together...*
+
+***
+
+*teaching style has influenced my love of math the most*
+
+***
+
+*I generally think that the math department here are quite good about gender and race diversity and respectful.*
+
+***
+
+*In general, it has been my experience, as well as my significant other's (female), that women are treated as less capable in STEM classes, and are often objectified instead of being considered for their academic capabilities; however, my best professors in STEM happen to have all been female; this is not to say my male professors were not as capable, but my female professors exuded a confidence only gained through years of 'fighting upstream.' Additionally, it has been my experience that diversity in all fields is extremely conducive to problem solving, as each perspective contributes a unique part of the solution. As the world has progressed, all modern STEM problems are of a level of complexity that requires significant human collaboration, and this collaboration is greatly benefitted by increased diversity.*
+
+***
+
+*I don't know why this question is necessary: "How would you rate your mathematical ability compared to other students of your gender or racial/ethnic identity."*
+
+***
+
+*New College's Mathematics Department is generally considered to be the most rigorous and challenging department on campus. Many students drop mathematics because of the workload, demanding coursework, and perceived expectations of their professors. I hope that we can build a more encouraging community. Many students of math at New College suffer emotionally.*
+
+***
+
+*New College, although has a high concentration with substantial high school math background, has pushed me to become better at Math and be less scared of spending extra time on material I dont understand. The QRC has helped me so much with understanding math both conceptually and in practice, which I didn't get before coming to this school.*
+
+***
+
+*As an asian american, average performance in math is considered poor with respect to our culture. I perform average,possibly below average, on calc III and some students ask me for help based on the stereotype that Asians are good at math. It really discourages me since my average performance in calc is not what the other students expect. I often get comments like "really? You did worse than I did, that's suprising". It's a microaggression that makes failure seem more daunting than it really is. Because of this, I often shy away from math despite the fact that I need more help.*
+
+***
+
 \  
 
 \  
+
+\  
+
+
