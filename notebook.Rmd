@@ -868,6 +868,7 @@ plot_by_ethnicity(q6_data,q6_title)
 Similar results are seen when we break down by ethnicity, where in all cases over 50\% of the respondents have considered an AOC in math.
 
 \  
+
 ## Are you interested in graduate school, in any discipline?
 \  
 
@@ -889,6 +890,7 @@ plot_by_ethnicity(q7_data,q7_title)
 The same can be seen when we break down by ethnicity with perhaps the exception of Hispanic/Latino students who seem to have a lower percentage of people interested in graduate school. Considering the small number of Hispanic/Latino respondents when compared with students of other ethnicities, we should consider the chance that this group may be under-represented.
 
 \  
+
 ## "I find mathematics interesting."
 \  
 
@@ -944,7 +946,7 @@ plot_by_gender(q10_data,q10_title)
 ```
 \  
 
-
+When it comes to the statement "It is easy to improve my math skills with practice," not-male students have a higher percentage of responses of "Strongly Disagree" and "Disagree" as well as a lower percentage of "Strongly Agree" and "Agree" when compared to their male counterparts.
 
 \  
 ```{r eval=TRUE, echo=FALSE}
@@ -952,7 +954,7 @@ plot_by_ethnicity(q10_data,q10_title)
 ```
 \  
 
-
+Asian respondents seem to agree more strongly with the same statement when compared to other groups, especially the African American and Hispanic groups.
 
 \  
 
@@ -961,56 +963,148 @@ plot_by_ethnicity(q10_data,q10_title)
 
 ```{r plot_q11, echo=FALSE, fig.keep='all'}
 q11_data <- plot_data$Q11
-q11_title <- "Men are generally\nbetter at math."
+q11_title <- "Men are generally\nbetter at math. \n"
 plot_by_gender(q11_data,q11_title)
+```
+\  
+
+Fortunately, the vast majority of both gender groups seem to "Strongly disagree" with the statement: "Men are generally better at math." 
+
+\  
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q11_data,q11_title)
 ```
+\  
+
+The same is true when we break down by ethnicity, with the lowest percentages of "Strongly Disagree" coming from the African American and Asian respondents. 
+
+\  
 
 ## "Many people believe that men are better suited to mathematics than women."
+\  
+
 ```{r plot_q12, echo=FALSE, fig.keep='all'}
 q12_data <- plot_data$Q12
-q12_title <- "Many believe that\nmen are generally\nbetter at math."
+q12_title <- "Many believe that \n men are generally \n better at math. \n "
 plot_by_gender(q12_data,q12_title)
+```
+\  
+
+The answers here seem to reverse; the marjority of students in both groups "Agrees" with the statement while the not-male students show more than twice as much the percentage of "Strongly Agree" when compared to male students. While they feel very strongly about the statement, it seems that the students' perception of people around them is that people agree with the statement. 
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q12_data,q12_title)
 ```
+\  
+
+As expected, the same flip happens when we breakdown by ethnicity. Asian respondents reported a significatly higher percentage of "Strongly Disagree" answers when compared to their peers. African American students replied exclusively with "Stronly agree" and "Agree" statements.
+
+\  
 
 ## "Some racial ethnic groups are generally better suited to mathematics than others."
+\  
+
 ```{r plot_q13, echo=FALSE, fig.keep='all'}
 q13_data <- plot_data$Q13
-q13_title <- "Some racial ethnic\ngroups are generally\nbetter at math."
+q13_title <- "Some racial ethnic \n groups are generally \n better at math. \n "
 plot_by_gender(q13_data,q13_title)
+```
+\  
+
+The majority of both male and non-male students "Strongly Disagree" with this statement.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q13_data,q13_title)
 ```
+\  
+
+We still verify the same when breaking down by ethnicity with the exception of Asian respondents who disagree with the statement less strongly when compared to other groups.
+
+\  
 
 ## "Many people believe that some racial ethnic groups are better suited to mathematics than others."
+\  
+
 ```{r plot_q14, echo=FALSE, fig.keep='all'}
 q14_data <- plot_data$Q14
-q14_title <- "Many believe that\nsome racial ethnic\ngroups are generally\nbetter at math."
+q14_title <- "Many believe that \n some racial ethnic \n groups are generally \n better at math. \n "
 plot_by_gender(q14_data,q14_title)
+```
+\  
+
+This question also pertains to racial stereotypes (i.e., "All Asian students everywhere, always, are exceptionally good at math."). Similar to when the same question was posed about other people's view on if gender plays a role in mathematical ability, the responses here lean heavily towards "Strongly Agree" and "Agree" for both groups.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q14_data,q14_title)
 ```
+\  
+
+When breaking down by ethnicity, we see a similar behavior when it comes to the Asian and African American groups; the former respondents disagree more strongly while the latter group replied exclusively with "Strongly agree" and "Agree" with the statement.
+
+\  
 
 ## Rate your mathematical ability compared to your high school student population.
+\  
+
 ```{r plot_q15, echo=FALSE, fig.keep='all'}
 q15_data <- plot_data$Q15
-q15_title <- "Rate your math skills\ncompared to your high\nschool population."
+q15_title <- "Rate your math skills \n compared to your high \n school population. \n "
 plot_by_gender(q15_data,q15_title)
+```
+\  
+
+Male respondents responded significatly more often with "Strongly Agree" to this statement when compared to the non-male group, who also disagreed more and had a higher rate of "Average" responses.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q15_data,q15_title)
 ```
+\  
+
+White, Multiethnic, and Asian respondents had the highest percentages of "Well above average" when comparing themselves to their highschool population, as opposed to African American students who replied with "Above average" more than any other response.
+
+\  
 
 ## Rate your mathematical ability compared to the student population at New College.
+\  
+
 ```{r plot_q16, echo=FALSE, fig.keep='all'}
 q16_data <- plot_data$Q16
-q16_title <- "Rate your math skills\ncompared to New\nCollege population."
+q16_title <- "Rate your math skills \n compared to New \n College population. \n "
 plot_by_gender(q16_data,q16_title)
+```
+\  
+
+While both gender groups seem to have a similar amount of respondents feeling like they belong in the "Average" category, non-male students have the most number of "Below average" and "Well below average" by far, while male students also consider themselves "Above Average" and "Well above average" much more often when it comes to comparing their mathematicall ability to other New College studentss.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q16_data,q16_title)
 ```
+\  
+
+African American and Asian respondents consider themselves more often "Above Average" and "Average" when comparing themselves to other New College students while Multiethnic and White students report to being "Below average" much more often.
+
+\  
 
 ## Rate your mathematical ability compared to your social group.
+\  
+
 ```{r plot_q17, echo=FALSE, fig.keep='all'}
 q17_data <- plot_data$Q17
-q17_title <- "Rate your math skills\ncompared to your\nsocial group."
+q17_title <- "Rate your math skills \n compared to your \n social group. \n "
 plot_by_gender(q17_data,q17_title)
+```
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q17_data,q17_title)
 ```
 
