@@ -86,12 +86,14 @@ WIth this in mind, instead of looking at gender identity, we looked at masculini
 
 ### Ethinicity
 
+Given the nature of Florida demographics, respondents were grouped into two groups: non-hispanic whites and everyone else, minorities. The goal was to see whether being a minority would influence the students' answers.
 
 
 \  
 
 ### AOC
 
+Since the focus is on math classes, we decided to group students into two groups as well: those who have a declared STEM AOC and those who do not.
 
 
 \  
@@ -413,7 +415,10 @@ In the output above, we see
 
 4. **Residual deviance**: `-2 * Log Likelihood` of the model as well as the `AIC`. Both the deviance and `AIC` are useful for model comparison.
 
-As said above, the nature of the test does not include a p-value by default. However, one way to calculate it in this case is by comparing the t-value against the standard normal distribution, like a z-test. Of course this is only true with infinite degrees of freedom, but is reasonably approximated by large samples, becoming increasingly biased as sample size decreases.
+
+Standard interpretation of the ordered log-odds coefficient is that for a one unit increase in the predictor, the response variable level is expected to change by its respective regression coefficient in the ordered log-odds scale while the other variables in the model are held constant.
+
+Again, the nature of the test does not include a p-value by default. However, one way to calculate it in this case is by comparing the t-value against the standard normal distribution, like a z-test. Of course this is only true with infinite degrees of freedom, but is reasonably approximated by large samples, becoming increasingly biased as sample size decreases.
 
 \  
 
@@ -452,7 +457,7 @@ The confidence intervals for both `gender` and `is_stem` do not include 0; `is_m
 
 The estimates in the output are given in units of ordered logits, or ordered log odds. So for `gender`, we would say that for a one unit increase in pared (i.e., going from 0 to 1), we expect a `1.10` increase in the expect value of `anxiety_levels` on the log odds scale, given all of the other variables in the model are held constant. 
 
-For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `0.73` increase in the expected value of apply in the log odds scale, given that all of the other variables in the model are held constant.
+For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `0.73` increase in the expected value of `anxiety_levels` in the log odds scale, given that all of the other variables in the model are held constant.
 
 The coefficients from the model can be somewhat difficult to interpret because they are scaled in terms of logs. Another way to interpret logistic regression models is to convert the coefficients into odds ratios. To get the OR and confidence intervals, we just exponentiate the estimates and confidence intervals.
 
@@ -473,15 +478,18 @@ exp(cbind(OR = coef(anxiety_model), olr_ci))
 
 These coefficients are called proportional odds ratios and we would interpret these pretty much as we would odds ratios from a binary logistic regression. 
 
-For `gender`, we would say that for a one unit increase in `gender`, i.e., going from `0` (Not male) to `1` (Male), the odds of *"Much more anxiety"* applying versus *"A little more anxiety"* or *"Much less anxiety"* applying combined are `3.02` greater, given that all of the other variables in the model are held constant. 
+Interpreting these Odds ratios we are essentially comparing the people who are in groups greater than $x$ versus
+those who are in groups less than or equal to $x$, where $x$ is the level of the response variable. Hence for a one unit
+change in the predictor variable, the odds for cases in a group that is greater than $x$ versus less than or equal to
+$x$ are the proportional odds times larger. 
 
-Likewise, the odds *"Much more anxiety"* or *"A little more anxiety"* applying versus *"Much less anxiety"* applying is `3.02` times greater, with all things constant. 
+In this case, for a one unit increase in the `gender`variable (i.e., going from `0` (Not male) to `1` (Male)), the odds of high `anxiety_level` responses versus the combined adjacent `anxiety_level` categories are 3.016 times greater, given the other variables are held constant in the model. For a one unit increase in the `is_stem`variable (i.e., going from `0` (Non STEM AOC) to `1` (STEM AOC)), the odds of high `anxiety_level` responses versus the combined adjacent `anxiety_level` categories are 2.074 times greater, given the other variables are held constant in the model.
 
 \  
 
-Now to automate everything:
+Now to automate the steps above:
 
-```{r olr_function}
+```{r olr_function, echo=TRUE}
 #Creating function for the steps above
 get_olr <- function(response, df){
   model <- polr(response ~ gender + is_minority + year + is_stem, data = df, Hess = TRUE)
@@ -491,8 +499,8 @@ get_olr <- function(response, df){
   coefficients_table <- cbind(coefficients_table, "p value" = p_values)
   coefficients <- summary(model)$coefficients[1:4,1]
   suppressMessages(olr_ci <- confint(model))
-  exp <- exp(cbind(OR = coef(model), olr_ci))
-  return (list(paste("Summary"), summary, paste("Confidence intervals:"),olr_ci, paste("Exponentiated estimates, OR, and CI:"), exp))
+  exp <- exp(coef(model))
+  return (list(paste("Coefficients"), coefficients, paste("Confidence intervals:"),olr_ci, paste("Odds Ratio:"), exp))
 }
 ```
 
@@ -500,7 +508,7 @@ get_olr <- function(response, df){
 
 #### Confidence level
 
-```{r olr_confidence_level}
+```{r olr_confidence_level, eval=TRUE, echo=TRUE}
 # Grabing our response variable from question 16
 confidence_level <- data$Q16
 
@@ -510,9 +518,9 @@ get_olr(confidence_level, data)
 
 \  
 
-+ `Confidence interval`
+`Confidence interval`
 
-The confidence intervals for `gender`, `year`, and `is_stem` do not include 0; `is_minority` does: **There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels.**
+The confidence intervals for `gender`, `year`, and `is_stem` do not include 0; `is_minority` does: **There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels in mathematics classes.**
 
 We would say that for a one unit increase in `gender` (from not male to male), we expect a `1.15` increase in the expected value of `confidence_levels` on the log odds scale, given all of the other variables in the model are held constant. 
 
@@ -520,24 +528,80 @@ For `year`, we would say that for a one unit increase in `year`, we would expect
 
 For `is_stem`, we would say that for a one unit increase in `is_stem`, we would expect a `1.40` increase in the expected value of `confidence_levels` in the log odds scale, given that all of the other variables in the model are held constant.
 
-+ `OR and CI`
 
-For `gender`, we would say that for a one unit increase in `gender`, i.e., going from `0` (Not male) to `1` (Male), the odds of *"Well above average"* applying versus *"Above average"* or *"Well below average"* applying combined are `3.15` greater, given that all of the other variables in the model are held constant. Likewise, the odds *"Well above average"* or *"Above average"* applying versus *"Well below average"* applying is `3.15` times greater, with all things constant. 
++ **Odds Ratio**
+
+For a one unit increase in the `gender` variable, i.e., going from `0` (Not male) to `1` (Male), the odds of higher `confidence_levels` versus the combined adjacent response categories for the question is 3.15 times greater given the other variables are held constant in the model. For a one unit increase in the `year` variable, the odds of higher `confidence_levels` versus the combined adjacent response categories for the question is 1.33 times greater given the other variables are held constant in the model. For `is_stem` the number is 4.05, showing that being STEM major or not is highly influential as to how students feel in math classes.
 
 \  
 
 #### Gender Discrimination
 
-```{r olr_gender_discrimination}
+```{r olr_gender_discrimination, eval=TRUE, echo=TRUE}
+# Getting response data from question 25
 gender_discrimination_felt <- data$Q25
+# Calling OLR
 get_olr(gender_discrimination_felt, data)
+```
+
+\  
+
++ **Confidence interval**
+
+The confidence intervals for `gender`, and `year` do not include 0; `is_minority` and `is_stem` do: **There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination in mathematics classes.**
+
+We would say that for a one unit increase in `gender` (from not male to male), we expect a `2.43` *decrease* in the expected value of `gender_discrimination_felt` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `year`, we would say that for a one unit increase in `year`, we would expect a `0.32` increase in the expected value of `gender_discrimination_felt` in the log odds scale, given that all of the other variables in the model are held constant.
+
++ **Odds Ratio**
+
+For a one unit increase in the `gender` variable, the odds of higher perceived `gender_discrimination` versus the combined adjacent response categories for the question is 0.08 times greater given the other variables are held constant in the model. For a one unit increase in the `year` variable, the odds of higher perceived `gender_discrimination` versus the combined adjacent response categories for the question is 1.38 times greater given the other variables are held constant in the model.
+
+
+\  
+
+#### Stereotype threat
+
+```{r olr_stereotype, eval=TRUE, echo=TRUE}
+# Getting response data from question 23
+stereotype_threat_felt <- data$Q23
+# Calling OLR
+get_olr(stereotype_threat_felt, data)
 ```
 
 \  
 
 + `Confidence interval`
 
-The confidence intervals for `gender`, and `year` do not include 0; `is_minority` and `is_stem` do: **There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination.**
+The confidence intervals for `gender`, and `is_minority` do not include 0; `year` and `is_stem` do: **There is evidence to support that a student's gender and ethnicity are statistically significant predictors of their reported feelings of being a target of stereotype threat in mathematics classes.**
+
+We would say that for a one unit increase in `gender` (from not male to male), we expect a `1.23` increase in the expected value of `stereotype_threat` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `is_minority`, we would expect a `-0.72` *decrease* in the expected value of `stereotype_threat` in the log odds scale, given that all of the other variables in the model are held constant.
+
++ **Odds Ratio**
+
+For a one unit increase in the `gender` and `is_minority` variables, the odds of higher perceived `stereotype_threat` versus the combined adjacent response categories for the question are, respectively, 3.452 and 0.483 times greater given the other variables are held constant in the model.
+
+
+\  
+
+
+#### Gender discrimination
+
+```{r olr_racial_discrimination, eval=TRUE, echo=TRUE}
+# Getting response data from question 26
+racial_discrimination_felt <- data$Q26
+# Calling OLR
+get_olr(racial_discrimination_felt, data)
+```
+
+\  
+
++ `Confidence interval`
+
+The confidence intervals for `gender`, and `year` do not include 0; `is_minority` and `is_stem` do: **There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination in mathematics classes.**
 
 We would say that for a one unit increase in `gender` (from not male to male), we expect a `2.43` *decrease* in the expected value of `gender_discrimination_felt` on the log odds scale, given all of the other variables in the model are held constant. 
 
@@ -549,30 +613,30 @@ For `gender`, we would say that for a one unit increase in `gender`, i.e., going
 
 \  
 
-#### Stereotype threat
-
-```{r olr_stereotype}
-stereotype_threat_felt <- data$Q23
-get_olr(stereotype_threat_felt, data)
-```
-
-\  
-
-#### Gender discrimination
-
-```{r olr_racial_discrimination, eval=FALSE}
-racial_discrimination_felt <- data$Q26
-get_olr(racial_discrimination_felt, data)
-```
-
-\  
 
 #### Sense of belonging
 
-```{r olr_belonging, eval=FALSE}
+```{r olr_belonging, eval=TRUE, echo=TRUE}
+# Getting response data from question 24
 sense_of_belonging <- data$Q24
+# Calling OLR
 get_olr(sense_of_belonging, data)
 ```
+
+\  
+
++ **Confidence interval**
+
+The confidence intervals for `gender`, and `is_stem` do not include 0; `is_minority` and `year` do: **There is evidence to support that a student's gender and AOC are statistically significant predictors of their sense of belonging in mathematics classes.**
+
+We would say that for a one unit increase in `gender` (from not male to male), we expect a `0.95` increase in the expected value of `sense_of_belonging` on the log odds scale, given all of the other variables in the model are held constant. 
+
+For `is_stem`, we would expect a `1.22` increase in the expected value of `sense_of_belonging` in the log odds scale, given that all of the other variables in the model are held constant.
+
++ **Odds Ratio**
+
+For`gender`, a one unit increase in this variable, the odds of high `sense_of_belonging` versus the combined adjacent response categories for the question are  2.570 times greater, given the other variables are held constant in the model. For a one unit increase in the `is_stem` variable (from a non-STEM AOC to a STEM AOC), the odds of high `sense_of_belonging` versus the combined adjacent response categories for the question are 3.40 times greater, given the other variables are held constant in the model.
+
 
 \  
 
@@ -600,7 +664,6 @@ get_mann_whitney <- function(ind_col, dep_col, df) {
 } 
 ```
 
-\  
 
 ***
 
@@ -658,13 +721,14 @@ $H_0$: Our responses are consistent with a specified distribution and
 
 $H_a$: Our responses are not consistent with a specified distribution, 
 
-where the specified distribution would be the one corresponding to the national statistics reported in websites such as [College Factual](https://www.collegefactual.com/colleges/new-college-of-florida/student-life/diversity/). We did not include the test because (1) it is a big jump to go from our survey responses to data that was collected in a completely different way across the country. To do that, we would have had to have access to the metrics collected by the institutional research department at New College, for example. This is something that can be explored in the future if there is interest.
+where the specified distribution would be the one corresponding to the national statistics reported in websites such as [College Factual](https://www.collegefactual.com/colleges/new-college-of-florida/student-life/diversity/). We did not include the test because (1) it is a big jump to go from our survey responses to data that was collected in a completely different way across the country. To do that, we would have had to have access to similar metrics collected by the institutional research department at New College, for example. This is something that can be explored in the future if there is interest.
 
 \  
 
 # Appendix
 
-## Appendix: Question breakdown
+Below are descriptive statistics that break down the responses for each question by gender and ethnicity.
+
 ```{r plot_prep, echo=FALSE, results='hide'}
 plot_data <- data
 
@@ -706,7 +770,9 @@ plot_by_ethnicity <- function(question_col, question_title) {
 }
 ```
 
-### Question 1: What gender do you identify as?
+## What gender do you identify as?
+\  
+
 ```{r plot_q1, echo=FALSE, fig.keep='all'}
 other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
 raw_gender <- as.character(raw_data$Q1)
@@ -715,71 +781,184 @@ raw_gender <- data.frame((as.factor(raw_gender)))
 colnames(raw_gender) <- "Gender"
 ggplot(raw_gender,aes(Gender, fill = Gender)) + geom_bar() + coord_flip() + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
+\ 
 
-### Question 2: What is your race/ethnicity?
+As mentioned in the overview, most respondents were female 60\%, followed by male, 28.3\%, and then non-binary students at 11.7\%.
+
+```{r}
+table(data$Q1)
+```
+
+
+\  
+
+## What is your race/ethnicity?
+\  
+
 ```{r plot_q2, echo=FALSE, fig.keep='all'}
 plot_q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
 plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
+\  
 
-### Question 3: What is your year at New College?
+The vast majority of students who replied to the survey are white. This falls in line with the ethnic diversity distribution at New College, where 68.9\% of students are white, 16.4\% are Hispanic/Latino. The remaining 14.7\% of students are either Asian, Black of African American, or have ethnicity unknown.
+
+\  
+
+## What is your year at New College?
+\  
+
 ```{r plot_q3, echo=FALSE, fig.keep='all'}
 plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
 plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
 
-### Question 4: What is your Area of Concentration?
+\  
+
+The majority of students who replied to the survey are first years. The number of respondents decreases sharply as the years increase.
+
+\  
+
+
+## What is your Area of Concentration?
+\  
+
 ```{r plot_q4, echo=FALSE, fig.keep='all'}
 q4_data <- mapvalues(plot_data$is_stem_aoc, from = c(TRUE,FALSE), to = c("STEM","Not STEM"))
-q4_title <- "AOC"
+q4_title <- "AOC type \n"
 plot_by_gender(q4_data,q4_title)
+```
+
+\  
+
+As would be somewhat expected, the percentage of STEM AOCs holders is larger for male students who responded. The majority of non-male students that answered this survey are non-STEM majors.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q4_data,q4_title)
 ```
+\  
+
+Of the people who responded to the survey, over 50\% of Asian and Multiethnic students have STEM AOCs. Hispanic/Latino, Black/African American, and White respondents are mostly non-STEM students.
+
+\  
 
 <!-- ## Question 5: Which math classes have you taken at New College? -->
 <!-- To be included: plot describing distribution of math classes taken by the respondents, column has multiple values and need to be normalized-->
 
-### Question 6: Are you considering, or did you ever consider a concentration in Math?
+## Are you considering, or did you ever consider a concentration in Math?
+\  
+
 ```{r plot_q6, echo=FALSE, fig.keep='all'}
 q6_data <- plot_data$Q6
-q6_title <- "Ever consider AOC\nin Math?"
+q6_title <- "Ever consider AOC\nin Math? \n"
 plot_by_gender(q6_data,q6_title)
+```
+\  
+
+In both male and not-male respondents, the majority of students have at one point considered an AOC in Math.
+
+\  
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q6_data,q6_title)
 ```
+\  
 
-### Question 7: Are you interested in graduate school, in any discipline?
+Similar results are seen when we break down by ethnicity, where in all cases over 50\% of the respondents have considered an AOC in math.
+
+\  
+## Are you interested in graduate school, in any discipline?
+\  
+
 ```{r plot_q7, echo=FALSE, fig.keep='all'}
 q7_data <- plot_data$Q7
-q7_title <- "Interested in\ngrad school?"
+q7_title <- "Interested in\ngrad school?\n"
 plot_by_gender(q7_data,q7_title)
+```
+\  
+
+The *vast majority* of students in both gender groups are interested in graduate school. 
+
+\  
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q7_data,q7_title)
 ```
+\  
 
-### Question 8: "I find mathematics interesting."
+The same can be seen when we break down by ethnicity with perhaps the exception of Hispanic/Latino students who seem to have a lower percentage of people interested in graduate school. Considering the small number of Hispanic/Latino respondents when compared with students of other ethnicities, we should consider the chance that this group may be under-represented.
+
+\  
+## "I find mathematics interesting."
+\  
+
 ```{r plot_q8, echo=FALSE, fig.keep='all'}
 q8_data <- plot_data$Q8
-q8_title <- "I find math\ninteresting."
+q8_title <- "I find math\ninteresting. \n"
 plot_by_gender(q8_data,q8_title)
+```
+\  
+
+While most students in both groups seem to agree with the statement, a higher percentage of male students "Strongly Agree" with it while a comparatively higher percentage of not-male students "Strongly disagree."
+
+\  
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q8_data,q8_title)
 ```
+\  
 
-### Question 9: "Mathematics leads to many possible career opportunities."
+All groups have similar responses, with multiethnic respondents having the highest percentage of people answering with "Strongly Agree" at first glance. To see if this difference is actually significant, a proportion test can be performed.
+
+\  
+
+## "Mathematics leads to many possible career opportunities."
+\  
+
 ```{r plot_q9, echo=FALSE, fig.keep='all'}
 q9_data <- plot_data$Q9
-q9_title <- "Math leads to many\ncareer opportunities."
+q9_title <- "Math leads to many\ncareer opportunities. \n"
 plot_by_gender(q9_data,q9_title)
+```
+\  
+
+Responses are similarly distributed between both groups.
+
+\  
+
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q9_data,q9_title)
 ```
+\  
 
-### Question 10: "With practice it is easy for me to improve my skills in math."
+When we break down by ethnicity, Asian respondents seem to feel more strongly about the statement when compared to other groups.
+
+\  
+
+## "With practice it is easy for me to improve my skills in math."
+\  
+
 ```{r plot_q10, echo=FALSE, fig.keep='all'}
 q10_data <- plot_data$Q10
-q10_title <- "It is easy to improve\nmy math skills with\npractice"
+q10_title <- "It is easy to improve \n my math skills with \n practice \n"
 plot_by_gender(q10_data,q10_title)
+```
+\  
+
+
+
+\  
+```{r eval=TRUE, echo=FALSE}
 plot_by_ethnicity(q10_data,q10_title)
 ```
+\  
 
-### Question 11: "Men are generally better suited to mathematics than women."
+
+
+\  
+
+## "Men are generally better suited to mathematics than women."
+\  
+
 ```{r plot_q11, echo=FALSE, fig.keep='all'}
 q11_data <- plot_data$Q11
 q11_title <- "Men are generally\nbetter at math."
@@ -787,7 +966,7 @@ plot_by_gender(q11_data,q11_title)
 plot_by_ethnicity(q11_data,q11_title)
 ```
 
-### Question 12: "Many people believe that men are better suited to mathematics than women."
+## "Many people believe that men are better suited to mathematics than women."
 ```{r plot_q12, echo=FALSE, fig.keep='all'}
 q12_data <- plot_data$Q12
 q12_title <- "Many believe that\nmen are generally\nbetter at math."
@@ -795,7 +974,7 @@ plot_by_gender(q12_data,q12_title)
 plot_by_ethnicity(q12_data,q12_title)
 ```
 
-### Question 13: "Some racial ethnic groups are generally better suited to mathematics than others."
+## "Some racial ethnic groups are generally better suited to mathematics than others."
 ```{r plot_q13, echo=FALSE, fig.keep='all'}
 q13_data <- plot_data$Q13
 q13_title <- "Some racial ethnic\ngroups are generally\nbetter at math."
@@ -803,7 +982,7 @@ plot_by_gender(q13_data,q13_title)
 plot_by_ethnicity(q13_data,q13_title)
 ```
 
-### Question 14: "Many people believe that some racial ethnic groups are better suited to mathematics than others."
+## "Many people believe that some racial ethnic groups are better suited to mathematics than others."
 ```{r plot_q14, echo=FALSE, fig.keep='all'}
 q14_data <- plot_data$Q14
 q14_title <- "Many believe that\nsome racial ethnic\ngroups are generally\nbetter at math."
@@ -811,7 +990,7 @@ plot_by_gender(q14_data,q14_title)
 plot_by_ethnicity(q14_data,q14_title)
 ```
 
-### Question 15: Rate your mathematical ability compared to your high school student population.
+## Rate your mathematical ability compared to your high school student population.
 ```{r plot_q15, echo=FALSE, fig.keep='all'}
 q15_data <- plot_data$Q15
 q15_title <- "Rate your math skills\ncompared to your high\nschool population."
@@ -819,7 +998,7 @@ plot_by_gender(q15_data,q15_title)
 plot_by_ethnicity(q15_data,q15_title)
 ```
 
-### Question 16: Rate your mathematical ability compared to the student population at New College.
+## Rate your mathematical ability compared to the student population at New College.
 ```{r plot_q16, echo=FALSE, fig.keep='all'}
 q16_data <- plot_data$Q16
 q16_title <- "Rate your math skills\ncompared to New\nCollege population."
@@ -827,7 +1006,7 @@ plot_by_gender(q16_data,q16_title)
 plot_by_ethnicity(q16_data,q16_title)
 ```
 
-### Question 17: Rate your mathematical ability compared to your social group.
+## Rate your mathematical ability compared to your social group.
 ```{r plot_q17, echo=FALSE, fig.keep='all'}
 q17_data <- plot_data$Q17
 q17_title <- "Rate your math skills\ncompared to your\nsocial group."
@@ -835,7 +1014,7 @@ plot_by_gender(q17_data,q17_title)
 plot_by_ethnicity(q17_data,q17_title)
 ```
 
-### Question 18: Rate your mathematical ability compared to other students of your gender.
+## Rate your mathematical ability compared to other students of your gender.
 ```{r plot_q18, echo=FALSE, fig.keep='all'}
 q18_data <- plot_data$Q18
 q18_title <- "Rate your math skills\ncompared to students\nof your gender."
@@ -843,7 +1022,7 @@ plot_by_gender(q18_data,q18_title)
 plot_by_ethnicity(q18_data,q18_title)
 ```
 
-### Question 19: Rate your mathematical ability compared to other students of your racial ethnic group.
+## Rate your mathematical ability compared to other students of your racial ethnic group.
 ```{r plot_q19, echo=FALSE, fig.keep='all'}
 q19_data <- plot_data$Q19
 q19_title <- "Rate your math skills\ncompared to students\nof your racial ethnic\ngroup."
@@ -851,7 +1030,7 @@ plot_by_gender(q19_data,q19_title)
 plot_by_ethnicity(q19_data,q19_title)
 ```
 
-### Question 20: Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
+## Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
 ```{r plot_q20, echo=FALSE, fig.keep='all'}
 q20_data <- plot_data$Q20
 q20_title <- "Likelihood of dropping\na difficult math class."
@@ -859,7 +1038,7 @@ plot_by_gender(q20_data,q20_title)
 plot_by_ethnicity(q20_data,q20_title)
 ```
 
-### Question 21: Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
+## Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
 ```{r plot_q21, echo=FALSE, fig.keep='all'}
 q21_data <- plot_data$Q21
 q21_title <- "Ever dropped a\ndifficult math class?"
@@ -867,7 +1046,7 @@ plot_by_gender(q21_data,q21_title)
 plot_by_ethnicity(q21_data,q21_title)
 ```
 
-### Question 22: Compared to other subjects, do you feel more or less anxiety in mathematics classes?
+## Compared to other subjects, do you feel more or less anxiety in mathematics classes?
 ```{r plot_q22, echo=FALSE, fig.keep='all'}
 q22_data <- plot_data$Q22
 q22_title <- "More or less anxiety\nin math classes?"
@@ -875,7 +1054,7 @@ plot_by_gender(q22_data,q22_title)
 plot_by_ethnicity(q22_data,q22_title)
 ```
 
-### Question 23: How often are you concerned that your performance in math will confirm a negative stereotype about you?
+## How often are you concerned that your performance in math will confirm a negative stereotype about you?
 ```{r plot_q23, echo=FALSE, fig.keep='all'}
 q23_data <- plot_data$Q23
 q23_title <- "Frequency of concerns\nthat your math abilities\nwill confirm negative\nstereotypes?"
@@ -883,7 +1062,7 @@ plot_by_gender(q23_data,q23_title)
 plot_by_ethnicity(q23_data,q23_title)
 ```
 
-### Question 24: Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
+## Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
 ```{r plot_q24, echo=FALSE, fig.keep='all'}
 q24_data <- plot_data$Q24
 q24_title <- "Feel comfortable\nor out of place in\nNCF math class?"
@@ -891,14 +1070,14 @@ plot_by_gender(q24_data,q24_title)
 plot_by_ethnicity(q24_data,q24_title)
 ```
 
-### Question 25: Have you ever felt that you were perceived or treated differently in a math class due to your gender?
+## Have you ever felt that you were perceived or treated differently in a math class due to your gender?
 ```{r plot_q25, echo=FALSE, fig.keep='all'}
 q25_data <- plot_data$Q25
 q25_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour gender?"
 plot_by_gender(q25_data,q25_title) 
 ```
 
-### Question 26: Have you ever felt that you were perceived or treated differently in a math class due to your race or ethnicity?
+## Have you ever felt that you were perceived or treated differently in a math class due to your race or ethnicity?
 ```{r plot_q26, echo=FALSE, fig.keep='all'}
 q26_data <- plot_data$Q26
 q26_title <- "Ever felt you were\ntreated differently in\nmath class due to\nyour race or ethnicity?"
@@ -907,3 +1086,32 @@ plot_by_ethnicity(q26_data,q26_title)
 
 # Conclusion
 
+## Tests of association
+
+In the case of question 17, “How would you rate your mathematical ability, compared to your social group?” we cannot conclude that a student’s gender leads to a different response on this survey question.
+
+## OLR findings
+
+1. There is evidence to support that a student's gender and AOC are statistically significant predictors of their reported anxiety levels in mathematics classes.
+
+2. There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels in mathematics classes.
+
+3. There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination in mathematics classes.
+
+4. There is evidence to support that a student's gender and ethnicity are statistically significant predictors of their reported feelings of being a target of stereotype threat in mathematics classes.
+
+5. There is evidence to support that a student's gender and year are statistically significant predictors of their reported feelings of gender discrimination in mathematics classes.
+
+6. There is evidence to support that a student's gender and AOC are statistically significant predictors of their sense of belonging in mathematics classes.
+
+## Mann-Whitney U tests
+
+1. For question 7, "Are you interested in graduate school (in any discipline)?", we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.
+
+2. For question 23, How often are you concerned that your performance in math will confirm a negative stereotype about you?, we reject the null hypothesis and conclude that there is a statistically significant difference between the responses of male students and non-male students when asked about the frequency of concerns that their performance in math will confirm a negative stereotype about them.
+
+\  
+
+\  
+
+\  
