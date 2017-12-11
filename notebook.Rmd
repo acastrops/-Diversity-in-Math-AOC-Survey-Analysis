@@ -746,7 +746,9 @@ race_ethnicity_data <- data[,ethnicity_groups]
 overall_race_ethnicity <- data.frame(apply(race_ethnicity_data, MARGIN = 1, FUN = assign_ethnicity))
 colnames(overall_race_ethnicity) <- "Race/Ethnicity"
 plot_data <- cbind(plot_data,overall_race_ethnicity)
-plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(5,4,1:3,6)])
+plot_data <- na.omit(plot_data)
+
+plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(1:3,5,4)])
 
 plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
 
