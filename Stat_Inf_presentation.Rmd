@@ -1,0 +1,149 @@
+---
+title: Does the gender and ethnicity of New College students influence their experience
+  with math classes?
+author: "Adriana Souza, Lydia LaSeur, Roger Filmyer"
+date: "12/12/2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# Loading packages we will be using
+library(survey)
+library(srvyr)
+library(psych)
+library(shiny)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(reshape2)
+library(tidyr)
+library(stringi)
+library(likert)
+
+## Libraries for OLR (Ordinal Logistic Regression)
+library(foreign)
+library(MASS)
+library(Hmisc)
+
+# load workspace from notebook
+load("DiversityInMath.Rdata")
+```
+
+## Goals of the Survey
+
+Measure the following with respect to students from underrepresented groups in math courses at NCF:  
+
+- Belonging uncertainty  
+
+- Confidence levels  
+
+- Stereotype threat  
+
+
+## Background Information
+
+- New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.  
+
+- The data was de-identified for the purpose of this study so no IRB approval was required.  
+
+- Responders were 60% female, 28.3% male, and 11.7% non-binary. 
+
+
+## Data and Cleaning
+- **Likert item responses**
+    + Strongly Disagree...Strongly Agree
+  
+- **Gender**
+    + Male
+    + Non-male
+  
+- **Ethnicity**
+    + Non-hispanic white
+    + Minorty
+  
+- **AOC**
+    + STEM
+    + Non-STEM
+
+## Anxiety Level | Visualize Responses by Gender {.smaller}
+- "Compared to other subjects, do you feel more or less anxiety in mathematics classes?"  
+```{r anxiety_plot_by_gender, echo=FALSE}
+plot_by_gender(q22_data,q22_title)
+```
+
+
+## Anxiety Level | Visualize Responses by Race/Ethnicity
+
+```{r anxiety_plot_by_ethnicity, echo=FALSE}
+plot_by_ethnicity(q22_data,q22_title)
+```
+
+
+## Anxiety Level | Analysis {.smaller}
+```{r anxiety_analysis, echo=FALSE, results='hide'}
+get_olr(anxiety_level, data)
+get_mann_whitney(data$Q1, data$Q22, data)
+
+```
+- Ordinal Logistic Regression
+    + The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do: There is evidence to support that a student's gender and AOC are statistically significant predictors of their reported anxiety levels.
+
+- Mann-Whitney U Test
+    + p-value of 2.313 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
+    
+- Chi-Squared Test of Association  
+
+
+## Confidence Level | Visualize Responses by Gender {.smaller}
+- "How would you rate your mathematical ability compared to the student population at New College?"
+```{r confidence_plot_by_gender, echo=FALSE}
+plot_by_gender(q16_data,q16_title)
+```
+
+
+## Confidence Level | Visualize Responses by Race/Ethnicity
+```{r confidence_plot_by_ethnicity, echo=FALSE}
+plot_by_ethnicity(q16_data,q16_title)
+```
+
+## Confidence Level | Analysis
+```{r confidence_analysis, echo=FALSE, results='hide'}
+get_olr(confidence_level, data)
+get_mann_whitney(data$Q1,data$Q16,data)
+```
+- Ordinal Logistic Regression
+    + The confidence intervals for `gender`, `year`, and `is_stem` do not include 0; `is_minority` does: There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels in mathematics classes.
+    
+- Mann-Whitney U Test
+    + p-value of 2.278 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
+    
+- Chi-Squared Test of Association 
+
+## Stereotype Threat | Visualize Responses by Gender {.smaller}
+"How often are you concerned that your performance in math will confirm a negative stereotype about you?"
+```{r stereotype_plot_by_gender, echo=FALSE}
+plot_by_gender(q23_data,q23_title)
+```
+
+
+## Stereotype Threat | Visualize Responses by Race/Ethnicity
+```{r stereotype_plot_by_ethnicity, echo=FALSE}
+plot_by_ethnicity(q23_data,q23_title)
+```
+
+
+
+## Stereotype Threat | Analysis {.smaller}
+```{r stereotype_analysis, echo=FALSE, results='hide'}
+get_olr(stereotype_threat_felt, data)
+get_mann_whitney(data$Q1,data$Q23,data)
+```
+- Ordinal Logistic Regression
+    + The confidence intervals for `gender`, and `is_minority` do not include 0; `year` and `is_stem`. There is evidence to support that a student's gender and ethnicity are statistically significant predictors of their reported feelings of being a target of stereotype threat in math classes.
+    
+- Mann-Whitney U Test
+    + p-value of 2.465 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
+    
+- Chi-Squared Test of Association  
