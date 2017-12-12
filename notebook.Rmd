@@ -21,7 +21,6 @@ library(srvyr)
 library(psych)
 library(shiny)
 library(plyr)
-library(dplyr)
 library(ggplot2)
 library(tibble)
 library(reshape2)
@@ -33,6 +32,9 @@ library(likert)
 library(foreign)
 library(MASS)
 library(Hmisc)
+
+## MASS ruins dplyr
+library(dplyr)
 ```
 
 \  
@@ -341,11 +343,39 @@ plot_by_ethnicity <- function(question_col, question_title) {
 
 ## Contingency tables and test of association
 
-A contingency table is a table showing the distribution of one variable in rows and another in columns, used to study the association between the two variables.
+A contingency table is a table showing the distribution of one variable in rows and another in columns, used to study the association between the two variables. It is also known as a cross-tabulation or "crosstab". To test whether there are significant differences between the groups, we will perform a chi-squared test of association.
 
-In the case of question 17, *"How would you rate your mathematical ability, compared to your social group?"*, we first needed to consolidate the five response groups into three; the chi-squared test assumes that each cell in the crosstab has an expected value of at least 5, and in the case of male-identifying students rating themselves well below average. 
+Here, we will look at responses to question 16, *"How would you rate your mathematical ability, compared to the student population at New College?"*. Below is the contingency table for this question's responses:
 
-On the chunk below we create the two functions we will be using:
+```{r crosstab ability vs NCF, eval=TRUE, echo=TRUE}
+gender_vs_new_college_perception <- table(data$Q1, data$Q16)
+gender_vs_new_college_perception
+```
+
+An assumption of the chi-squared test is that each cell in the crosstab has an expected value of at least 5. Since we can see frequencies below that, we should double check that 
+
+```{r expected value ability vs NCF}
+frequencies_q16 <- data %>%
+  group_by(Q16) %>%
+  summarise(count = n()) %>%
+  mutate(freq = count / sum(count)) %>%
+  dplyr::select(freq) # Why is MASS shadowing dplyr functions here
+
+frequencies_q16 <- matrix(frequencies_q16$freq)
+
+frequencies_q1 <- data %>%
+  group_by(Q1) %>%
+  summarise(count = n()) %>%
+  mutate(freq = count / sum(count)) %>%
+  dplyr::select(freq)
+
+frequencies_q1 <- matrix(frequencies_q1$freq)
+
+expected_freq <- (frequencies_q1 %*% t(frequencies_q16)) * nrow(data)
+round(expected_freq, 2)
+```
+
+Our expected frequencies for males rating themselves well-below or well-above average are both under 5, so we need to consolidate the five response groups into three. In the chunk below we create the two functions we will be using:
 
 ```{r to_three_groups}
 to_three_averages <- function(fctr){
@@ -359,23 +389,16 @@ to_three_agrees <- function(fctr){
 }
 ```
 
-\  
-
-The actual EV is:
-
-```{r crosstab_socialgroup_example, eval=TRUE, echo=TRUE}
-gender_vs_social_group_perception <- table(data$Q1, data$Q17)
-gender_vs_social_group_perception
-```
+And below is our actual test:
 
 ```{r crosstab_socialgroup_3groups, eval=TRUE, echo=TRUE}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q17))
+gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q16))
 gender_vs_social_group_perception
 chisq.test(gender_vs_social_group_perception)
 #mantelhaen.test(gender_vs_social_group_perception)
 ```
 
-When performing a chi-squared test of independence, we do not find a significant result. We cannot conclude that a student's gender leads to a different response on this survey question.
+When performing a chi-squared test of independence, we find a significant result. We can expect male-identifying students to respond differently, although we cannot make inferences about whether males are more or less confident with a chi-squared test.
 
 \  
 
