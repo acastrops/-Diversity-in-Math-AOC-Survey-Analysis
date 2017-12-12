@@ -46,7 +46,7 @@ Measure the following with respect to students from underrepresented groups in m
 
 - New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.  
 
-- The data was de-identified for the purpose of this study so no IRB approval was required.  
+- Data was de-identified before being given to us. No IRB approval, since results are not being published.
 
 - Responders were 60% female, 28.3% male, and 11.7% non-binary. 
 
@@ -94,6 +94,7 @@ get_mann_whitney(data$Q1, data$Q22, data)
     + p-value of 2.313 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
     
 - Chi-Squared Test of Association  
+    + Anxiety level responses are dependent on a student's masculinity (self-id male/non-male). p = 3.354 x 10^-05^
 
 
 ## Confidence Level | Visualize Responses by Gender {.smaller}
@@ -120,6 +121,7 @@ get_mann_whitney(data$Q1,data$Q16,data)
     + p-value of 2.278 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
     
 - Chi-Squared Test of Association 
+    + Students' self-reported masculinity (self-ID male/non-male) and confidence levels are associated/dependent. p = 1.604 x 10^-5^.
 
 ## Stereotype Threat | Visualize Responses by Gender {.smaller}
 "How often are you concerned that your performance in math will confirm a negative stereotype about you?"
@@ -147,3 +149,4 @@ get_mann_whitney(data$Q1,data$Q23,data)
     + p-value of 2.465 x 10^-6^ allows the rejection of the null hypothesis. Conclude that the responses from male and non-male students are from different distributions.
     
 - Chi-Squared Test of Association  
+    + Students' self-reported masculinity and anxiety levels are associated/dependent. p = 5.758 x 10^-06^
