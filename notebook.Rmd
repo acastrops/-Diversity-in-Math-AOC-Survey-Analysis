@@ -781,29 +781,53 @@ get_mann_whitney <- function(ind_col, dep_col, df) {
 } 
 ```
 
+\  
 
-<!-- *** -->
+***
 
-<!-- **Question 7:** *Are you interested in graduate school (in any discipline)?*  -->
+**Question 22:** *Compared to other subjects, do you feel more or less anxiety in mathematics classes?* 
 
-<!-- **Possible answers:** "No", "Maybe", or "Yes"  -->
+**Possible answers:** "Much more anxiety", "A little more anxiety", "About the same", "A little less anxiety", or "Much less anxiety"  
 
-<!-- *** -->
+***
 
-<!-- All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.   -->
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
 
-<!-- **$H_0:$ the two samples are from the same distribution**, i.e. there is significant difference between responses from male students and non-male students   -->
+**$H_0:$ the two samples are from the same distribution**, i.e. there is significant difference between responses from male students and non-male students  
 
-<!-- **$H_a:$ the two samples are from two different distributions**, i.e. there is a significant difference between responses from male students and non-male students. The type-two error is $\alpha = .05$. -->
+**$H_a:$ the two samples are from two different distributions**, i.e. there is a significant difference between responses from male students and non-male students. The type-two error is still $\alpha = .05$  
 
-<!-- ```{r q7_mann_whitney, eval=TRUE, echo=TRUE} -->
-<!-- q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, data) -->
-<!-- q7_mw_results -->
-<!-- ``` -->
+```{r q22_mann_whitney, eval=TRUE, echo=TRUE}
+q22_mw_results <- get_mann_whitney(data$Q1, data$Q22, data)
+q22_mw_results
+```
 
-<!-- With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.    -->
+With a p-value of $2.313 \times 10^{-6}$ we **reject** the null hypothesis and conclude that there is a statistically significant difference between the responses of male students and non-male students when asked about the level of anxiety felt in math classes compared to other subjects.  
 
-<!-- \   -->
+\  
+
+***
+
+**Question 16:** *How would you rate your mathematical ability compared to the student population at New College?* 
+
+**Possible answers:** "Well below average", "Below average", "Average", "Above average", or "Well above average"
+
+***
+
+All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+
+**$H_0:$ the two samples are from the same distribution**, i.e. there is significant difference between responses from male students and non-male students  
+
+**$H_a:$ the two samples are from two different distributions**, i.e. there is a significant difference between responses from male students and non-male students. The type-two error is still $\alpha = .05$  
+
+```{r q16_mann_whitney, eval=TRUE, echo=TRUE}
+q16_mw_results <- get_mann_whitney(data$Q1, data$Q16, data)
+q16_mw_results
+```
+
+With a p-value of $2.278 \times 10^{-6}$ we **reject** the null hypothesis and conclude that there is a statistically significant difference between the responses of male students and non-male students when asked about how they would rate their mathematical abilities compared to the student population at New College.
+
+\  
 
 ***
 
