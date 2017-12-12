@@ -415,10 +415,10 @@ to_three_agrees <- function(fctr){
 
 And below is our actual test:
 
-```{r crosstab_socialgroup_3groups, eval=TRUE, echo=TRUE}
-gender_vs_social_group_perception <- table(data$Q1, to_three_averages(data$Q16))
-gender_vs_social_group_perception
-chisq.test(gender_vs_social_group_perception)
+```{r crosstab_NCF_student_3groups, eval=TRUE, echo=TRUE}
+gender_vs_NCF_student_perception <- table(data$Q1, to_three_averages(data$Q16))
+gender_vs_NCF_student_perception
+gender_vs_NCF_student_perception_test <- chisq.test(gender_vs_NCF_student_perception)
 #mantelhaen.test(gender_vs_social_group_perception)
 ```
 
@@ -430,12 +430,18 @@ Additionally, we can perform this same analysis on question 22 ("*Compared to ot
 ```{r crosstab anxiety, eval=TRUE, echo=TRUE}
 gender_vs_anxiety <- table(data$Q1, data$Q22)
 gender_vs_anxiety
-chisq.test(gender_vs_anxiety)
+gender_vs_anxiety_test <- chisq.test(gender_vs_anxiety)
 ```
 
 (Note that in this case, there is no need to reduce to three groups, since we have enough responses for each entry, by each gender)
 
 In this case we also find a significant result. Male-identifying respondents respond differently from those who do not identify as male.
+
+```{r crosstab stereotype, eval=TRUE, echo=TRUE}
+gender_vs_stereotype <- table(data$Q1, data$Q23)
+gender_vs_stereotype
+gender_vs_stereotype_test <- chisq.test(gender_vs_stereotype)
+```
 
 \  
 
@@ -1543,6 +1549,9 @@ Asian and Black/Afrincan American, and Multiethnic respondents report to have fe
 \  
 
 
+```{r save_workspace_for_presentation, echo=FALSE}
+save.image("DiversityInMath.Rdata")
+```
 
 \  
 

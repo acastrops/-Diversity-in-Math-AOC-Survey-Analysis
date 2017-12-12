@@ -35,11 +35,11 @@ load("DiversityInMath.Rdata")
 Measure the following with respect to students from underrepresented groups in math courses at NCF:  
 
 - Belonging uncertainty  
-
+    
 - Confidence levels  
-
+    
 - Stereotype threat  
-
+    
 
 ## Background Information
 - New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.  
@@ -53,25 +53,25 @@ Measure the following with respect to students from underrepresented groups in m
 - **Likert item responses** 
     + Ordinal data: ordered but not translatable to continuous form
     + Strongly Disagree...Strongly Agree
-  
+    
 - **Gender**
     + Male
     + Non-male
-  
+    
 - **Ethnicity**
     + Non-hispanic white
     + Minorty
-  
+    
 - **AOC**
     + STEM
     + Non-STEM
-
+    
 
 ## Issues
 - **Small Sample Size**: only ~260 responses
-
+    
 - **Non-response Bias**: the phenomenon that the required information is not obtained from the people selected in the sample
-
+    
 - **Social Desirability and Acquiescence Bias**: students may avoid using extreme response categories out of a desire of being perceived as having extremist views and may tend to aree with statements as presented
 
 
@@ -92,6 +92,7 @@ plot_by_ethnicity(q22_data,q22_title)
 ```{r anxiety_analysis, echo=FALSE, results='hide'}
 get_olr(anxiety_level, data)
 get_mann_whitney(data$Q1, data$Q22, data)
+gender_vs_anxiety_test
 ```
 - Ordinal Logistic Regression
     + The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do: There is evidence to support that a student's gender and AOC are statistically significant predictors of their reported anxiety levels.
@@ -120,6 +121,7 @@ plot_by_ethnicity(q16_data,q16_title)
 ```{r confidence_analysis, echo=FALSE, results='hide'}
 get_olr(confidence_level, data)
 get_mann_whitney(data$Q1,data$Q16,data)
+gender_vs_NCF_student_perception_test
 ```
 - Ordinal Logistic Regression
     + The confidence intervals for `gender`, `year`, and `is_stem` do not include 0; `is_minority` does: There is evidence to support that a student's gender, year, and AOC are statistically significant predictors of their reported confidence levels in mathematics classes.
@@ -148,6 +150,7 @@ plot_by_ethnicity(q23_data,q23_title)
 ```{r stereotype_analysis, echo=FALSE, results='hide'}
 get_olr(stereotype_threat_felt, data)
 get_mann_whitney(data$Q1,data$Q23,data)
+gender_vs_stereotype_test
 ```
 - Ordinal Logistic Regression
     + The confidence intervals for `gender`, and `is_minority` do not include 0; `year` and `is_stem`. There is evidence to support that a student's gender and ethnicity are statistically significant predictors of their reported feelings of being a target of stereotype threat in math classes.
