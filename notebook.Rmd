@@ -286,6 +286,57 @@ data$Q26 <- factor(data$Q26,levels(data$Q26)[c(1,3,2)], ordered = TRUE)
 ```
 
 \  
+
+The data is prepared for plotting by remapping race and ethnicity for easier visualization, reformatting some of the responses for the legend, and providing functions for plotting either the overall responses, responses grouped by gender, and responses grouped by race/ethnicity.  
+
+```{r plot_prep, echo=FALSE, results='hide'}
+plot_data <- data
+
+assign_ethnicity <- function(record) {
+  if (sum(record) > 1) return("Multiethnic")
+  if (sum(record) == 0) return(NA)
+  if (record[1] == TRUE) return("Asian")
+  if (record[2] == TRUE) return("Black or African American")
+  if (record[3] == TRUE) return("Hispanic or Latino")
+  if (record[4] == TRUE) return("Native Hawaiian or Other Pacific Islander")
+  if (record[5] == TRUE) return("White")
+}
+race_ethnicity_data <- data[,ethnicity_groups]
+
+overall_race_ethnicity <- data.frame(apply(race_ethnicity_data, MARGIN = 1, FUN = assign_ethnicity))
+colnames(overall_race_ethnicity) <- "Race/Ethnicity"
+plot_data <- cbind(plot_data,overall_race_ethnicity)
+plot_data <- na.omit(plot_data)
+
+plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(1:3,5,4)])
+
+plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
+
+plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
+
+cbPalette <- c("#4e5d90", "#9ba6ce", "#d9e8f0", "#c3c3c3", "#5a5858")
+
+plot_overall <- function(question_col, question_title) {
+  overall_plot <- ggplot(plot_data, aes(x = question_col, fill = factor(question_col))) 
+  overall_plot <- overall_plot + geom_bar() + coord_flip()
+  overall_plot <- overall_plot + xlab("Response") + ylab("Count") + guides(fill=guide_legend(title=question_title,reverse=TRUE)) + scale_fill_manual(values=cbPalette)
+  return(overall_plot)
+}
+plot_by_gender <- function(question_col, question_title) {
+  gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
+  gender_plot <- gender_plot + geom_bar(position="fill") + coord_flip()
+  gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title,reverse=TRUE)) + scale_fill_manual(values=cbPalette)
+  return(gender_plot)
+}
+
+plot_by_ethnicity <- function(question_col, question_title) {
+  ethnicity_plot <- ggplot(plot_data, aes(x = `Race/Ethnicity`, fill = factor(question_col))) 
+  ethnicity_plot <- ethnicity_plot + geom_bar(position="fill") + coord_flip()
+  ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title,reverse=TRUE)) + scale_fill_manual(values=cbPalette)
+  return(ethnicity_plot)
+}
+```
+\  
 \  
 
 ## Contingency tables and test of association
@@ -665,28 +716,28 @@ get_mann_whitney <- function(ind_col, dep_col, df) {
 ```
 
 
-***
+<!-- *** -->
 
-**Question 7:** *Are you interested in graduate school (in any discipline)?* 
+<!-- **Question 7:** *Are you interested in graduate school (in any discipline)?*  -->
 
-**Possible answers:** "No", "Maybe", or "Yes" 
+<!-- **Possible answers:** "No", "Maybe", or "Yes"  -->
 
-***
+<!-- *** -->
 
-All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.  
+<!-- All responses for this question were divided into two samples based on gender. One sample for all the male respondents and one sample for all of the non-male respondents.   -->
 
-**$H_0:$ the two samples are from the same distribution**, i.e. there is significant difference between responses from male students and non-male students  
+<!-- **$H_0:$ the two samples are from the same distribution**, i.e. there is significant difference between responses from male students and non-male students   -->
 
-**$H_a:$ the two samples are from two different distributions**, i.e. there is a significant difference between responses from male students and non-male students. The type-two error is $\alpha = .05$.
+<!-- **$H_a:$ the two samples are from two different distributions**, i.e. there is a significant difference between responses from male students and non-male students. The type-two error is $\alpha = .05$. -->
 
-```{r q7_mann_whitney, eval=TRUE, echo=TRUE}
-q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, data)
-q7_mw_results
-```
+<!-- ```{r q7_mann_whitney, eval=TRUE, echo=TRUE} -->
+<!-- q7_mw_results <- get_mann_whitney(data$Q1, data$Q7, data) -->
+<!-- q7_mw_results -->
+<!-- ``` -->
 
-With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.   
+<!-- With a p-value of 0.1708 we fail to reject the null hypothesis and conclude that there is no statistically significant difference between the responses of male students and non-male students when asked about their interest in graduate school.    -->
 
-\  
+<!-- \   -->
 
 ***
 
@@ -728,54 +779,12 @@ where the specified distribution would be the one corresponding to the national 
 # Appendix
 
 Below are descriptive statistics that break down the responses for each question by gender and ethnicity.
-
-```{r plot_prep, echo=FALSE, results='hide'}
-plot_data <- data
-
-assign_ethnicity <- function(record) {
-  if (sum(record) > 1) return("Multiethnic")
-  if (sum(record) == 0) return(NA)
-  if (record[1] == TRUE) return("Asian")
-  if (record[2] == TRUE) return("Black or African American")
-  if (record[3] == TRUE) return("Hispanic or Latino")
-  if (record[4] == TRUE) return("Native Hawaiian or Other Pacific Islander")
-  if (record[5] == TRUE) return("White")
-}
-race_ethnicity_data <- data[,ethnicity_groups]
-
-overall_race_ethnicity <- data.frame(apply(race_ethnicity_data, MARGIN = 1, FUN = assign_ethnicity))
-colnames(overall_race_ethnicity) <- "Race/Ethnicity"
-plot_data <- cbind(plot_data,overall_race_ethnicity)
-plot_data <- na.omit(plot_data)
-
-plot_data$`Race/Ethnicity` <-  factor(plot_data$`Race/Ethnicity`,levels(plot_data$`Race/Ethnicity`)[c(1:3,5,4)])
-
-plot_data$Q25 <- mapvalues(plot_data$Q25, from = levels(plot_data$Q25), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
-
-plot_data$Q26 <- mapvalues(plot_data$Q26, from = levels(plot_data$Q26), to = c("No","Yes, but not at NCF","Yes, at NCF & elsewhere"))
-
-cbPalette <- c("#4e5d90", "#9ba6ce", "#d9e8f0", "#c3c3c3", "#5a5858")
-
-
-plot_by_gender <- function(question_col, question_title) {
-  gender_plot <- ggplot(plot_data, aes(x = Q1,fill = factor(question_col))) 
-  gender_plot <- gender_plot + geom_bar(position="fill") + coord_flip()
-  gender_plot <- gender_plot + xlab("Gender") + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
-  return(gender_plot)
-}
-
-plot_by_ethnicity <- function(question_col, question_title) {
-  ethnicity_plot <- ggplot(plot_data, aes(x = `Race/Ethnicity`, fill = factor(question_col))) 
-  ethnicity_plot <- ethnicity_plot + geom_bar(position="fill") + coord_flip()
-  ethnicity_plot <- ethnicity_plot + ylab("Percentage") + guides(fill=guide_legend(title=question_title)) + scale_fill_manual(values=cbPalette)
-  return(ethnicity_plot)
-}
-```
+\  
 
 ## What gender do you identify as?
 \  
 
-```{r plot_q1, echo=FALSE, fig.keep='all'}
+```{r plot_q1, eval=TRUE, echo=FALSE, fig.keep='all'}
 other <- (raw_data$Q1 != "Male" & raw_data$Q1 != "Female")
 raw_gender <- as.character(raw_data$Q1)
 raw_gender[other] <- "Other"
@@ -797,7 +806,7 @@ table(data$Q1)
 ## What is your race/ethnicity?
 \  
 
-```{r plot_q2, echo=FALSE, fig.keep='all'}
+```{r plot_q2, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_q2 <- ggplot(plot_data, aes(`Race/Ethnicity`, fill = `Race/Ethnicity`)) 
 plot_q2 + geom_bar() + coord_flip() + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
@@ -810,7 +819,7 @@ The vast majority of students who replied to the survey are white. This falls in
 ## What is your year at New College?
 \  
 
-```{r plot_q3, echo=FALSE, fig.keep='all'}
+```{r plot_q3, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_q3 <- ggplot(plot_data, aes(x = Q3, fill = Q3))
 plot_q3 + geom_bar() + xlab('Year') + guides(fill=FALSE) + scale_fill_manual(values=cbPalette)
 ```
@@ -821,13 +830,21 @@ The majority of students who replied to the survey are first years. The number o
 
 \  
 
-
 ## What is your Area of Concentration?
 \  
 
-```{r plot_q4, echo=FALSE, fig.keep='all'}
+
+```{r plot_q4_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q4_data <- mapvalues(plot_data$is_stem_aoc, from = c(TRUE,FALSE), to = c("STEM","Not STEM"))
 q4_title <- "AOC type \n"
+plot_overall(q4_data,q4_title)
+```
+\  
+
+Most of the respondents to the survey have a non-STEM AOC.
+
+\  
+```{r plot_q4_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q4_data,q4_title)
 ```
 
@@ -837,7 +854,7 @@ As would be somewhat expected, the percentage of STEM AOCs holders is larger for
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q4_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q4_data,q4_title)
 ```
 \  
@@ -846,37 +863,94 @@ Of the people who responded to the survey, over 50\% of Asian and Multiethnic st
 
 \  
 
-<!-- ## Question 5: Which math classes have you taken at New College? -->
-<!-- To be included: plot describing distribution of math classes taken by the respondents, column has multiple values and need to be normalized-->
+## Which math classes have you taken at New College?
+\  
+
+```{r plot_q5_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
+math_classes <- data.frame(math_classes_list = plot_data$Q5)
+math_classes_groups <- levels(math_classes$math_classes_list) %>% strsplit(", ") %>% unlist %>% unique
+math_classes <- math_classes %>%
+  rowid_to_column("id") %>%
+  mutate(classes = strsplit(as.character(math_classes_list), ", ")) %>%
+  unnest() %>%
+  dcast(id ~ classes)
+math_classes[, -1] <- !is.na(math_classes)[,-1]
+math_classes <- cbind(gender = plot_data$Q1[math_classes$id],Ethnicity = plot_data$`Race/Ethnicity`[math_classes$id],math_classes[,-1])
+
+#plot overall responses
+overall <- data.frame(Count=apply(math_classes[,3:10],2,sum))
+overall$Course = rownames(overall)
+ggplot(data=overall, aes(x=Course, y=Count, fill=Course)) +
+geom_bar(stat="identity") + coord_flip() + guides(fill=FALSE) + scale_fill_brewer()
+```
+\  
+```{r plot_q5_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
+#plot responses grouped by gender
+classes_by_gender <- data.frame(Male=apply(math_classes[math_classes$gender == "Male",3:10],2,sum),NonMale=apply(math_classes[math_classes$gender == "Not Male",3:10],2,sum))
+classes_by_gender$Course <-  rownames(classes_by_gender)
+classes_by_gender <- melt(classes_by_gender)
+
+ggplot(classes_by_gender, aes(x = Course, y = value)) +   
+  geom_bar(aes(fill = variable), stat="identity") + coord_flip() + scale_fill_manual(values=cbPalette) + guides(fill=guide_legend(title="Math classes taken \n at NCF",reverse=TRUE)) + ylab("Percentage")
+```
+
+
+\  
+```{r plot_q5_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
+#plot responses grouped by ethnicity
+classes_by_ethnicity <- data.frame(apply(math_classes[math_classes$Ethnicity == "Asian",3:10],2,sum),
+                                   apply(math_classes[math_classes$Ethnicity == "Black or African American",3:10],2,sum),
+                                   apply(math_classes[math_classes$Ethnicity == "Hispanic or Latino",3:10],2,sum),
+                                   apply(math_classes[math_classes$Ethnicity == "White",3:10],2,sum),
+                                   apply(math_classes[math_classes$Ethnicity == "Multiethnic",3:10],2,sum))
+colnames(classes_by_ethnicity) <- c("Asian","Black or African American", "Hispanic or Latino","White","Multiethnic")
+classes_by_ethnicity$Course <-  rownames(classes_by_ethnicity)
+classes_by_ethnicity <- melt(classes_by_ethnicity)
+
+ggplot(classes_by_ethnicity, aes(x = Course, y = value)) +   
+  geom_bar(aes(fill = variable), stat="identity") + coord_flip() + scale_fill_manual(values=cbPalette) + guides(fill=guide_legend(title="Math classes taken \n at NCF",reverse=TRUE)) + ylab("Percentage")
+```
+
 
 ## Are you considering, or did you ever consider a concentration in Math?
 \  
-
-```{r plot_q6, echo=FALSE, fig.keep='all'}
+```{r plot_q6_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q6_data <- plot_data$Q6
 q6_title <- "Ever consider AOC\nin Math? \n"
+plot_overall(q6_data,q6_title)
+```
+\  
+
+```{r plot_q6_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q6_data,q6_title)
 ```
 \  
 
-In both male and not-male respondents, the majority of students have at one point considered an AOC in Math.
+In both male and not-male respondents, the majority of students have not considered an AOC in Math.
 
 \  
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q6_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q6_data,q6_title)
 ```
 \  
 
-Similar results are seen when we break down by ethnicity, where in all cases over 50\% of the respondents have considered an AOC in math.
+Similar results are seen when we break down by ethnicity, where in all cases over 50\% of the respondents have not considered an AOC in math.
 
 \  
 
 ## Are you interested in graduate school, in any discipline?
 \  
-
-```{r plot_q7, echo=FALSE, fig.keep='all'}
+```{r plot_q7_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q7_data <- plot_data$Q7
 q7_title <- "Interested in\ngrad school?\n"
+plot_overall(q7_data,q7_title)
+```
+\  
+
+An overwhelming majority of repondents have an interest in graduate school. 
+
+\  
+```{r plot_q7_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q7_data,q7_title)
 ```
 \  
@@ -884,7 +958,7 @@ plot_by_gender(q7_data,q7_title)
 The *vast majority* of students in both gender groups are interested in graduate school. 
 
 \  
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q7_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q7_data,q7_title)
 ```
 \  
@@ -896,9 +970,14 @@ The same can be seen when we break down by ethnicity with perhaps the exception 
 ## "I find mathematics interesting."
 \  
 
-```{r plot_q8, echo=FALSE, fig.keep='all'}
+```{r plot_q8_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q8_data <- plot_data$Q8
 q8_title <- "I find math\ninteresting. \n"
+plot_overall(q8_data,q8_title)
+```
+\  
+
+```{r plot_q8_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q8_data,q8_title)
 ```
 \  
@@ -906,7 +985,7 @@ plot_by_gender(q8_data,q8_title)
 While most students in both groups seem to agree with the statement, a higher percentage of male students "Strongly Agree" with it while a comparatively higher percentage of not-male students "Strongly disagree."
 
 \  
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q8_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q8_data,q8_title)
 ```
 \  
@@ -918,9 +997,14 @@ All groups have similar responses, with multiethnic respondents having the highe
 ## "Mathematics leads to many possible career opportunities."
 \  
 
-```{r plot_q9, echo=FALSE, fig.keep='all'}
+```{r plot_q9_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q9_data <- plot_data$Q9
 q9_title <- "Math leads to many\ncareer opportunities. \n"
+plot_overall(q9_data,q9_title)
+```
+\  
+
+```{r plot_q9_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q9_data,q9_title)
 ```
 \  
@@ -929,7 +1013,7 @@ Responses are similarly distributed between both groups.
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot q9_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q9_data,q9_title)
 ```
 \  
@@ -941,9 +1025,14 @@ When we break down by ethnicity, Asian respondents seem to feel more strongly ab
 ## "With practice it is easy for me to improve my skills in math."
 \  
 
-```{r plot_q10, echo=FALSE, fig.keep='all'}
+```{r plot_q10_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q10_data <- plot_data$Q10
 q10_title <- "It is easy to improve \n my math skills with \n practice \n"
+plot_overall(q10_data,q10_title)
+```
+\  
+
+```{r plot_q10_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q10_data,q10_title)
 ```
 \  
@@ -951,7 +1040,7 @@ plot_by_gender(q10_data,q10_title)
 When it comes to the statement "It is easy to improve my math skills with practice," not-male students have a higher percentage of responses of "Strongly Disagree" and "Disagree" as well as a lower percentage of "Strongly Agree" and "Agree" when compared to their male counterparts.
 
 \  
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q10_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q10_data,q10_title)
 ```
 \  
@@ -963,9 +1052,14 @@ Asian respondents seem to agree more strongly with the same statement when compa
 ## "Men are generally better suited to mathematics than women."
 \  
 
-```{r plot_q11, echo=FALSE, fig.keep='all'}
+```{r plot_q11_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q11_data <- plot_data$Q11
 q11_title <- "Men are generally\nbetter at math. \n"
+plot_overall(q11_data,q11_title)
+```
+\  
+
+```{r plot_q11, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q11_data,q11_title)
 ```
 \  
@@ -973,7 +1067,7 @@ plot_by_gender(q11_data,q11_title)
 Fortunately, the vast majority of both gender groups seem to "Strongly disagree" with the statement: "Men are generally better at math." 
 
 \  
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q11_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q11_data,q11_title)
 ```
 \  
@@ -985,9 +1079,14 @@ The same is true when we break down by ethnicity, with the lowest percentages of
 ## "Many people believe that men are better suited to mathematics than women."
 \  
 
-```{r plot_q12, echo=FALSE, fig.keep='all'}
+```{r plot_q12_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q12_data <- plot_data$Q12
 q12_title <- "Many believe that \n men are generally \n better at math. \n "
+plot_overall(q12_data,q12_title)
+```
+\  
+
+```{r plot_q12_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q12_data,q12_title)
 ```
 \  
@@ -996,7 +1095,7 @@ The answers here seem to reverse; the marjority of students in both groups "Agre
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q12_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q12_data,q12_title)
 ```
 \  
@@ -1008,9 +1107,14 @@ As expected, the same flip happens when we breakdown by ethnicity. Asian respond
 ## "Some racial ethnic groups are generally better suited to mathematics than others."
 \  
 
-```{r plot_q13, echo=FALSE, fig.keep='all'}
+```{r plot_q13_overll, eval=TRUE, echo=FALSE, fig.keep='all'}
 q13_data <- plot_data$Q13
 q13_title <- "Some racial ethnic \n groups are generally \n better at math. \n "
+plot_overall(q13_data,q13_title)
+```
+\  
+
+```{r plot_q13_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q13_data,q13_title)
 ```
 \  
@@ -1019,7 +1123,7 @@ The majority of both male and non-male students "Strongly Disagree" with this st
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q13_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q13_data,q13_title)
 ```
 \  
@@ -1031,9 +1135,14 @@ We still verify the same when breaking down by ethnicity with the exception of A
 ## "Many people believe that some racial ethnic groups are better suited to mathematics than others."
 \  
 
-```{r plot_q14, echo=FALSE, fig.keep='all'}
+```{r plot_q14_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q14_data <- plot_data$Q14
 q14_title <- "Many believe that \n some racial ethnic \n groups are generally \n better at math. \n "
+plot_overall(q14_data,q14_title)
+```
+\  
+
+```{r plot_q14_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q14_data,q14_title)
 ```
 \  
@@ -1042,7 +1151,7 @@ This question also pertains to racial stereotypes (i.e., "All Asian students eve
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q14_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q14_data,q14_title)
 ```
 \  
@@ -1054,9 +1163,14 @@ When breaking down by ethnicity, we see a similar behavior when it comes to the 
 ## Rate your mathematical ability compared to your high school student population.
 \  
 
-```{r plot_q15, echo=FALSE, fig.keep='all'}
+```{r plot_q15_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q15_data <- plot_data$Q15
 q15_title <- "Rate your math skills \n compared to your high \n school population. \n "
+plot_by_gender(q15_data,q15_title)
+```
+\  
+
+```{r plot_q15_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q15_data,q15_title)
 ```
 \  
@@ -1065,7 +1179,7 @@ Male respondents responded significatly more often with "Strongly Agree" to this
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q15_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q15_data,q15_title)
 ```
 \  
@@ -1077,9 +1191,14 @@ White, Multiethnic, and Asian respondents had the highest percentages of "Well a
 ## Rate your mathematical ability compared to the student population at New College.
 \  
 
-```{r plot_q16, echo=FALSE, fig.keep='all'}
+```{r plot_q16_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q16_data <- plot_data$Q16
 q16_title <- "Rate your math skills \n compared to New \n College population. \n "
+plot_overall(q16_data,q16_title)
+```
+\  
+
+```{r plot_q16_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q16_data,q16_title)
 ```
 \  
@@ -1088,7 +1207,7 @@ While both gender groups seem to have a similar amount of respondents feeling li
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q16_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q16_data,q16_title)
 ```
 \  
@@ -1100,9 +1219,14 @@ African American and Asian respondents consider themselves more often "Above Ave
 ## Rate your mathematical ability compared to your social group.
 \  
 
-```{r plot_q17, echo=FALSE, fig.keep='all'}
+```{r plot_q17_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q17_data <- plot_data$Q17
 q17_title <- "Rate your math skills \n compared to your \n social group. \n "
+plot_overall(q17_data,q17_title)
+```
+\  
+
+```{r plot_q17_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q17_data,q17_title)
 ```
 \  
@@ -1111,7 +1235,7 @@ Both gender groupings have similar answers, with male respondents rating themsel
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q17_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q17_data,q17_title)
 ```
 \  
@@ -1123,7 +1247,14 @@ Most groups rate themselves between "Well above average" and "Average" for the v
 ## Rate your mathematical ability compared to other students of your gender.
 \  
 
-```{r plot_q18, echo=FALSE, fig.keep='all'}
+```{r plot_q18_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
+q18_data <- plot_data$Q18
+q18_title <- "Rate your math skills \n compared to students \n of your gender. \n"
+plot_overall(q18_data,q18_title)
+```
+\  
+
+```{r plot_q18_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 q18_data <- plot_data$Q18
 q18_title <- "Rate your math skills \n compared to students \n of your gender. \n"
 plot_by_gender(q18_data,q18_title)
@@ -1136,7 +1267,7 @@ Keep in mind that because of the binary grouping of gender into male and non-mal
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q18_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q18_data,q18_title)
 ```
 
@@ -1149,9 +1280,14 @@ When accounting for ethnicity, people seemed to pick less extreme responses to t
 ## Rate your mathematical ability compared to other students of your racial ethnic group.
 \  
 
-```{r plot_q19, echo=FALSE, fig.keep='all'}
+```{r plot_q19_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q19_data <- plot_data$Q19
 q19_title <- "Rate your math skills \n compared to students\n of your racial ethnic \n group. \n "
+plot_overall(q19_data,q19_title)
+```
+\  
+
+```{r plot_q19_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q19_data,q19_title)
 ```
 \  
@@ -1160,7 +1296,7 @@ When comparing to their ethnic group, both gender groups seem to report a simila
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q19_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q19_data,q19_title)
 ```
 \  
@@ -1172,9 +1308,14 @@ African American respondents stand out from other groups with a majority of "Wel
 ## Imagine the following scenario: in the first few weeks of a math class, you have had difficulty understanding the material and completing some of the assignments. How likely are you to drop the class?
 \  
 
-```{r plot_q20, echo=FALSE, fig.keep='all'}
+```{r plot_q20, eval=TRUE, echo=FALSE, fig.keep='all'}
 q20_data <- plot_data$Q20
 q20_title <- "Likelihood of dropping \n a difficult math class. \n "
+plot_overall(q20_data,q20_title)
+```
+\  
+
+```{r plot_q20_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q20_data,q20_title)
 ```
 \  
@@ -1183,7 +1324,7 @@ Male respondents tend to be much less likely to drop a class in that situation w
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q20_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q20_data,q20_title)
 ```
 \  
@@ -1195,9 +1336,14 @@ Asian respondents report the highest percentage of being "Very unlikely" to drop
 ## Have you ever dropped or stopped attending a math class because you believed you were not going to do well?
 \  
 
-```{r plot_q21, echo=FALSE, fig.keep='all'}
+```{r plot_q21_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q21_data <- plot_data$Q21
 q21_title <- "Ever dropped a \n difficult math class? \n "
+plot_overall(q21_data,q21_title)
+```
+\  
+
+```{r plot_q21_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q21_data,q21_title)
 ```
 \  
@@ -1206,7 +1352,7 @@ The majority of both groups have reported to have never dropped a difficult math
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q21_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q21_data,q21_title)
 ```
 \  
@@ -1218,9 +1364,14 @@ Asian respondest have, by far, the lowest percentage for having dropped a diffic
 ## Compared to other subjects, do you feel more or less anxiety in mathematics classes?
 \  
 
-```{r plot_q22, echo=FALSE, fig.keep='all'}
+```{r plot_q22_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q22_data <- plot_data$Q22
 q22_title <- "More or less anxiety \n in math classes? \n "
+plot_overall(q22_data,q22_title)
+```
+\  
+
+```{r plot_q22_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q22_data,q22_title)
 ```
 \  
@@ -1229,7 +1380,7 @@ Non-male students report significantly higher percentages of "Much more anxiety"
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q22_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q22_data,q22_title)
 ```
 \  
@@ -1241,9 +1392,14 @@ Throuought the groups, the majority of respondents report having between "Much m
 ## How often are you concerned that your performance in math will confirm a negative stereotype about you?
 \  
 
-```{r plot_q23, echo=FALSE, fig.keep='all'}
+```{r plot_q23_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q23_data <- plot_data$Q23
 q23_title <- "Frequency of concerns \n that your performance in \n math will confirm negative \n stereotypes about them \n "
+plot_overall(q23_data,q23_title)
+```
+\  
+
+```{r plot_q23_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q23_data,q23_title)
 ```
 \  
@@ -1252,7 +1408,7 @@ The majority of male students replied with "Never" while the majority of non-mal
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q23_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q23_data,q23_title)
 ```
 \  
@@ -1264,9 +1420,14 @@ Asian, African American, and Hispanic/Latino students report the highest percent
 ## Think about a typical math course you have taken at New College or imagine taking one. Did/do you feel comfortable or out of place?
 \  
 
-```{r plot_q24, echo=FALSE, fig.keep='all'}
+```{r plot_q24_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q24_data <- plot_data$Q24
 q24_title <- "Feel comfortable \n or out of place in\n NCF math class? \n "
+plot_overall(q24_data,q24_title)
+```
+\  
+
+```{r plot_q24_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q24_data,q24_title)
 ```
 \  
@@ -1275,7 +1436,7 @@ The majority of male students report higher levels of "Very comfortable" and "So
 
 \  
 
-```{r eval=TRUE, echo=FALSE}
+```{r plot_q24_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q24_data,q24_title)
 ```
 \  
@@ -1287,9 +1448,14 @@ All groups have similarly distributed responses, with the exception of Asian res
 ## Have you ever felt that you were perceived or treated differently in a math class due to your gender?
 \  
 
-```{r plot_q25, echo=FALSE, fig.keep='all'}
+```{r plot_q25_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q25_data <- plot_data$Q25
 q25_title <- "Ever felt you were \n treated differently in \n math class due to \n your gender? \n "
+plot_overall(q25_data,q25_title) 
+```
+\  
+
+```{r plot_q25_by_gender, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_gender(q25_data,q25_title) 
 ```
 \  
@@ -1301,9 +1467,14 @@ The *vast* majority of male respondents report "No", while almost 50\% of non-ma
 ## Have you ever felt that you were perceived or treated differently in a math class due to your race or ethnicity?
 \  
 
-```{r plot_q26, echo=FALSE, fig.keep='all'}
+```{r plot_q26_overall, eval=TRUE, echo=FALSE, fig.keep='all'}
 q26_data <- plot_data$Q26
 q26_title <- "Ever felt you were \n treated differently in \n math class due to \n your race or ethnicity?"
+plot_overall(q26_data,q26_title) 
+```
+\  
+
+```{r plot_q26_by_ethnicity, eval=TRUE, echo=FALSE, fig.keep='all'}
 plot_by_ethnicity(q26_data,q26_title) 
 ```
 \  
