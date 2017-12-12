@@ -352,9 +352,11 @@ gender_vs_new_college_perception <- table(data$Q1, data$Q16)
 gender_vs_new_college_perception
 ```
 
-An assumption of the chi-squared test is that each cell in the crosstab has an expected value of at least 5. Since we can see frequencies below that, we should double check that 
+An assumption of the chi-squared test is that each cell in the crosstab has an expected value of at least 5. Since we can see *observed* frequencies below that threshold, we should double check that our expected frequencies are also above five.
 
 ```{r expected value ability vs NCF}
+
+# get per-level % of total for math ability question
 frequencies_q16 <- data %>%
   group_by(Q16) %>%
   summarise(count = n()) %>%
@@ -363,6 +365,7 @@ frequencies_q16 <- data %>%
 
 frequencies_q16 <- matrix(frequencies_q16$freq)
 
+# get per-level % of total for gender
 frequencies_q1 <- data %>%
   group_by(Q1) %>%
   summarise(count = n()) %>%
@@ -371,6 +374,7 @@ frequencies_q1 <- data %>%
 
 frequencies_q1 <- matrix(frequencies_q1$freq)
 
+# create a matrix of gender frequency * math ability and multiply everything by n
 expected_freq <- (frequencies_q1 %*% t(frequencies_q16)) * nrow(data)
 round(expected_freq, 2)
 ```
