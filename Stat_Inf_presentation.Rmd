@@ -32,7 +32,6 @@ load("DiversityInMath.Rdata")
 ```
 
 ## Goals of the Survey
-
 Measure the following with respect to students from underrepresented groups in math courses at NCF:  
 
 - Belonging uncertainty  
@@ -43,7 +42,6 @@ Measure the following with respect to students from underrepresented groups in m
 
 
 ## Background Information
-
 - New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.  
 
 - Data was de-identified before being given to us. No IRB approval, since results are not being published.
@@ -51,8 +49,9 @@ Measure the following with respect to students from underrepresented groups in m
 - Responders were 60% female, 28.3% male, and 11.7% non-binary. 
 
 
-## Data and Cleaning
-- **Likert item responses**
+## Data and Cleaning {.smaller}
+- **Likert item responses** 
+    + Ordinal data: ordered but not translatable to continuous form
     + Strongly Disagree...Strongly Agree
   
 - **Gender**
@@ -67,6 +66,15 @@ Measure the following with respect to students from underrepresented groups in m
     + STEM
     + Non-STEM
 
+
+## Issues
+- **Small Sample Size**: only ~260 responses
+
+- **Non-response Bias**: the phenomenon that the required information is not obtained from the people selected in the sample
+
+- **Social Desirability and Acquiescence Bias**: students may avoid using extreme response categories out of a desire of being perceived as having extremist views and may tend to aree with statements as presented
+
+
 ## Anxiety Level | Visualize Responses by Gender {.smaller}
 - "Compared to other subjects, do you feel more or less anxiety in mathematics classes?"  
 ```{r anxiety_plot_by_gender, echo=FALSE}
@@ -75,7 +83,6 @@ plot_by_gender(q22_data,q22_title)
 
 
 ## Anxiety Level | Visualize Responses by Race/Ethnicity
-
 ```{r anxiety_plot_by_ethnicity, echo=FALSE}
 plot_by_ethnicity(q22_data,q22_title)
 ```
@@ -85,7 +92,6 @@ plot_by_ethnicity(q22_data,q22_title)
 ```{r anxiety_analysis, echo=FALSE, results='hide'}
 get_olr(anxiety_level, data)
 get_mann_whitney(data$Q1, data$Q22, data)
-
 ```
 - Ordinal Logistic Regression
     + The confidence intervals for both `gender` and `is_stem` do not include 0; `is_minority` and `year` do: There is evidence to support that a student's gender and AOC are statistically significant predictors of their reported anxiety levels.
@@ -109,7 +115,8 @@ plot_by_gender(q16_data,q16_title)
 plot_by_ethnicity(q16_data,q16_title)
 ```
 
-## Confidence Level | Analysis
+
+## Confidence Level | Analysis {.smaller}
 ```{r confidence_analysis, echo=FALSE, results='hide'}
 get_olr(confidence_level, data)
 get_mann_whitney(data$Q1,data$Q16,data)
@@ -123,6 +130,7 @@ get_mann_whitney(data$Q1,data$Q16,data)
 - Chi-Squared Test of Association 
     + Students' self-reported masculinity (self-ID male/non-male) and confidence levels are associated/dependent. p = 1.604 x 10^-5^.
 
+
 ## Stereotype Threat | Visualize Responses by Gender {.smaller}
 "How often are you concerned that your performance in math will confirm a negative stereotype about you?"
 ```{r stereotype_plot_by_gender, echo=FALSE}
@@ -134,7 +142,6 @@ plot_by_gender(q23_data,q23_title)
 ```{r stereotype_plot_by_ethnicity, echo=FALSE}
 plot_by_ethnicity(q23_data,q23_title)
 ```
-
 
 
 ## Stereotype Threat | Analysis {.smaller}
