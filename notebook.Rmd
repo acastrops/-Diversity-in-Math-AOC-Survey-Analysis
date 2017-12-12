@@ -2,7 +2,7 @@
 title: Does the gender and ethnicity of New College students influence their experience
   with math classes?
 author: "Adriana Souza, Lydia LaSeur, Roger Filmyer"
-date: "November 12th, 2017"
+date: "December 12th, 2017"
 bibliography: citations.bibtex
 output:
   html_notebook:

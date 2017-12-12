@@ -19,14 +19,14 @@ Survey trying to measure:
 
 ***
 
-Backgroud information
+Background information
 ========================================================
 
 <br />
 
 + New College has 861 students (as of Fall 2016) and the survey had a total of 264 responses which are all complete.
 
-+ The data was de-identified for the purpose of this study so no IRB approval was required.
++ Data was de-identified before being given to us. No IRB approval, since results are not being published.
 
 ***
 
